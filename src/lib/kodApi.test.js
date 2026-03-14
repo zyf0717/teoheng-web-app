@@ -1,0 +1,247 @@
+import { describe, expect, it, vi } from 'vitest'
+
+import {
+  DEFAULT_BASE_URL,
+  deleteSong,
+  fetchPlaylist,
+  jsonp,
+  musicDown,
+  musicUp,
+  prioritizeSong,
+  queueSong,
+  restartDevice,
+  searchSongs,
+  toggleMute,
+  toggleVocals,
+} from './kodApi'
+
+function getInjectedScript() {
+  const script = document.body.querySelector('script')
+
+  if (!script) {
+    throw new Error('Expected a JSONP script tag to be injected')
+  }
+
+  return script
+}
+
+function resolveJsonpRequest(payload) {
+  const script = getInjectedScript()
+  const callbackName = new URL(script.src).searchParams.get('jsonpCallback')
+  window[callbackName](payload)
+}
+
+describe('kodApi', () => {
+  it('builds a SearchServlet JSONP request and normalizes search results', async () => {
+    const resultPromise = searchSongs(DEFAULT_BASE_URL, {
+      lang: '\u56fd\u8bed',
+      page: 0,
+    })
+
+    const script = getInjectedScript()
+    const requestUrl = new URL(script.src)
+
+    expect(requestUrl.pathname).toBe('/SearchServlet')
+    expect(requestUrl.searchParams.get('lang')).toBe('\u56fd\u8bed')
+    expect(requestUrl.searchParams.get('page')).toBe('0')
+    expect(requestUrl.searchParams.get('jsonpCallback')).toMatch(/^__openKodJsonp_/)
+
+    resolveJsonpRequest({
+      maxPage: 45658,
+      number: 1,
+      page: 0,
+      songList: [
+        {
+          cLOUD: 1,
+          sINGER: 'Tester',
+          sONGBM: '9029901',
+          sONGNAME: 'Lucky',
+        },
+      ],
+    })
+
+    await expect(resultPromise).resolves.toEqual({
+      maxPage: 45658,
+      number: 1,
+      page: 0,
+      raw: {
+        maxPage: 45658,
+        number: 1,
+        page: 0,
+        songList: [
+          {
+            cLOUD: 1,
+            sINGER: 'Tester',
+            sONGBM: '9029901',
+            sONGNAME: 'Lucky',
+          },
+        ],
+      },
+      songs: [
+        {
+          cloud: true,
+          id: '9029901',
+          name: 'Lucky',
+          singer: 'Tester',
+        },
+      ],
+    })
+
+    expect(document.body.querySelector('script')).toBeNull()
+  })
+
+  it('sends the Add1 command with the selected song id', async () => {
+    const commandPromise = queueSong(DEFAULT_BASE_URL, '9029901')
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Add1')
+    expect(requestUrl.searchParams.get('cmdValue')).toBe('9029901')
+
+    resolveJsonpRequest({ cmd: 'Add1', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Add1', code: '0' })
+  })
+
+  it('sends the Pro1 command with the selected song id', async () => {
+    const commandPromise = prioritizeSong(DEFAULT_BASE_URL, '9029901')
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Pro1')
+    expect(requestUrl.searchParams.get('cmdValue')).toBe('9029901')
+
+    resolveJsonpRequest({ cmd: 'Pro1', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Pro1', code: '0' })
+  })
+
+  it('sends the Del1 command with the selected song id', async () => {
+    const commandPromise = deleteSong(DEFAULT_BASE_URL, '1673128')
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Del1')
+    expect(requestUrl.searchParams.get('cmdValue')).toBe('1673128')
+
+    resolveJsonpRequest({ cmd: 'Del1', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Del1', code: '0' })
+  })
+
+  it('sends the MuOr command without a song id', async () => {
+    const commandPromise = toggleVocals(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('MuOr')
+    expect(requestUrl.searchParams.get('cmdValue')).toBeNull()
+
+    resolveJsonpRequest({ cmd: 'MuOr', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'MuOr', code: '0' })
+  })
+
+  it('sends the Reset command without a song id', async () => {
+    const commandPromise = restartDevice(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Reset')
+
+    resolveJsonpRequest({ cmd: 'Reset', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Reset', code: '0' })
+  })
+
+  it('sends the Mute command without a song id', async () => {
+    const commandPromise = toggleMute(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Mute')
+
+    resolveJsonpRequest({ cmd: 'Mute', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Mute', code: '0' })
+  })
+
+  it('sends the Music_up command without a song id', async () => {
+    const commandPromise = musicUp(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Music_up')
+
+    resolveJsonpRequest({ cmd: 'Music_up', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Music_up', code: '0' })
+  })
+
+  it('sends the Music_down command without a song id', async () => {
+    const commandPromise = musicDown(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Music_down')
+
+    resolveJsonpRequest({ cmd: 'Music_down', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Music_down', code: '0' })
+  })
+
+  it('normalizes playlist data from PlaylistServlet', async () => {
+    const playlistPromise = fetchPlaylist(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/PlaylistServlet')
+    expect(requestUrl.searchParams.get('type')).toBe('1')
+    expect(requestUrl.searchParams.get('onSelectPage')).toBe('true')
+
+    resolveJsonpRequest({
+      hasChange: 'true',
+      number: 2,
+      songList: [
+        { sINGER: 'Dreamer', sONGNAME: 'Youth', xH: '1503296' },
+        { sINGER: 'Eason', sONGNAME: 'Ten Years', xH: '1486462' },
+      ],
+      stateMuOr: false,
+      stateMute: false,
+      statePlay: false,
+    })
+
+    await expect(playlistPromise).resolves.toEqual({
+      hasChange: 'true',
+      number: 2,
+      raw: {
+        hasChange: 'true',
+        number: 2,
+        songList: [
+          { sINGER: 'Dreamer', sONGNAME: 'Youth', xH: '1503296' },
+          { sINGER: 'Eason', sONGNAME: 'Ten Years', xH: '1486462' },
+        ],
+        stateMuOr: false,
+        stateMute: false,
+        statePlay: false,
+      },
+      songs: [
+        { id: '1503296', name: 'Youth', singer: 'Dreamer' },
+        { id: '1486462', name: 'Ten Years', singer: 'Eason' },
+      ],
+      stateMuOr: false,
+      stateMute: false,
+      statePlay: false,
+    })
+  })
+
+  it('rejects JSONP requests that time out', async () => {
+    vi.useFakeTimers()
+
+    const requestPromise = jsonp(DEFAULT_BASE_URL, 'SearchServlet', { page: 0 })
+
+    await vi.advanceTimersByTimeAsync(10000)
+
+    await expect(requestPromise).rejects.toThrow('Request timed out for SearchServlet')
+    expect(document.body.querySelector('script')).toBeNull()
+  })
+})
