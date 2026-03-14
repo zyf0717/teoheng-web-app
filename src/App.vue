@@ -623,7 +623,7 @@ onBeforeUnmount(() => {
           <form data-test="search-form" class="grid-form filter-form" @submit.prevent="submitSearch">
             <label>
               Song title
-              <input v-model="searchForm.songName" type="text" placeholder="Insert title" />
+              <input v-model="searchForm.songName" data-test="search-song-name" type="text" placeholder="Insert title" />
             </label>
             <label>
               Singer

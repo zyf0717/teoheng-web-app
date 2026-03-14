@@ -195,7 +195,7 @@ describe('App', () => {
 
     await flushPromises()
     await wrapper.get('summary.filter-summary').trigger('click')
-    await wrapper.get('input[placeholder="Song title"]').setValue('Later')
+    await wrapper.get('[data-test="search-song-name"]').setValue('Later')
     await wrapper.get('[data-test="search-singer"]').setValue('Eason')
     await wrapper.get('[data-test="search-language"]').setValue('\u82f1\u8bed')
     await wrapper.get('[data-test="search-song-type"]').setValue('\u5bf9\u5531')
@@ -203,7 +203,7 @@ describe('App', () => {
     await wrapper.get('[data-test="search-reset"]').trigger('click')
     await flushPromises()
 
-    expect(wrapper.get('input[placeholder="Song title"]').element.value).toBe('')
+    expect(wrapper.get('[data-test="search-song-name"]').element.value).toBe('')
     expect(wrapper.get('[data-test="search-singer"]').element.value).toBe('')
     expect(wrapper.get('[data-test="search-language"]').element.value).toBe('')
     expect(wrapper.get('[data-test="search-song-type"]').element.value).toBe('')
