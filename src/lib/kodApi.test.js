@@ -4,6 +4,7 @@ import {
   DEFAULT_BASE_URL,
   deleteSong,
   fetchPlaylist,
+  fetchSingers,
   jsonp,
   micDown,
   micUp,
@@ -387,6 +388,51 @@ describe('kodApi', () => {
       stateMuOr: false,
       stateMute: false,
       statePlay: false,
+    })
+  })
+
+  it('normalizes singer data from SingerServlet', async () => {
+    const singerPromise = fetchSingers(DEFAULT_BASE_URL, {
+      singer: '',
+      singerType: '\u5168\u90e8',
+      sortType: '',
+      page: 0,
+    })
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/SingerServlet')
+    expect(requestUrl.searchParams.get('singer')).toBeNull()
+    expect(requestUrl.searchParams.get('singerType')).toBe('\u5168\u90e8')
+    expect(requestUrl.searchParams.get('sortType')).toBeNull()
+    expect(requestUrl.searchParams.get('page')).toBe('0')
+
+    resolveJsonpRequest({
+      maxPage: 10515,
+      number: 2,
+      page: 0,
+      singerList: [
+        { name: '\u5468\u6770\u4f26', picture: '27356.jpg' },
+        { name: '\u5218\u5fb7\u534e', picture: '26554.jpg' },
+      ],
+    })
+
+    await expect(singerPromise).resolves.toEqual({
+      maxPage: 10515,
+      number: 2,
+      page: 0,
+      raw: {
+        maxPage: 10515,
+        number: 2,
+        page: 0,
+        singerList: [
+          { name: '\u5468\u6770\u4f26', picture: '27356.jpg' },
+          { name: '\u5218\u5fb7\u534e', picture: '26554.jpg' },
+        ],
+      },
+      singers: [
+        { name: '\u5468\u6770\u4f26', picture: '27356.jpg' },
+        { name: '\u5218\u5fb7\u534e', picture: '26554.jpg' },
+      ],
     })
   })
 

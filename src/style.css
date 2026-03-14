@@ -82,6 +82,25 @@ select {
   color: var(--color-text);
 }
 
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.9rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-muted) 50%),
+    linear-gradient(135deg, var(--color-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.2rem) calc(50% - 0.12rem),
+    calc(100% - 0.85rem) calc(50% - 0.12rem);
+  background-size: 0.4rem 0.4rem, 0.4rem 0.4rem;
+  background-repeat: no-repeat;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
 label {
   display: grid;
   gap: 0.5rem;
@@ -106,6 +125,21 @@ pre {
   margin-bottom: 1rem;
 }
 
+.settings-panel {
+  font-family: inherit;
+}
+
+.settings-panel .subtitle {
+  max-width: none;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.settings-panel code {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: inherit;
+}
+
 .hero {
   display: grid;
   gap: 1rem;
@@ -117,6 +151,10 @@ pre {
   gap: 1rem;
   grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
   align-items: start;
+}
+
+.primary-column {
+  min-width: 0;
 }
 
 .hero {
@@ -204,6 +242,11 @@ p {
   transform: rotate(90deg);
 }
 
+.filter-summary::after {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
 .filter-form {
   padding: 0 1rem 1rem;
   border-top: 1px solid var(--color-border);
@@ -214,6 +257,8 @@ p {
   grid-column: 1 / -1;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
 }
 
 .filter-actions button {
@@ -228,10 +273,36 @@ p {
 }
 
 .theme-toggle {
-  width: fit-content;
-  min-width: 3rem;
+  width: 2.5rem;
+  min-width: 2.5rem;
   justify-self: start;
-  padding-inline: 0.85rem;
+  padding-inline: 0;
+  text-align: center;
+}
+
+.text-toggle {
+  width: 2.5rem;
+  min-width: 2.5rem;
+  padding-inline: 0;
+  text-align: center;
+}
+
+.theme-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: inherit;
+}
+
+.toggle-text-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.settings-note {
+  margin-top: -0.25rem;
 }
 
 .field-help {
@@ -296,12 +367,25 @@ p {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0.75rem 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.command-bar-row {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.75rem;
   overflow-x: auto;
+}
+
+.command-bar-row-primary {
+  padding-bottom: 0.1rem;
+}
+
+.command-bar-row-secondary {
+  padding-top: 0.1rem;
 }
 
 .command-bar-inner button {
@@ -404,7 +488,7 @@ th {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .pagination-bar {
@@ -412,8 +496,9 @@ th {
   align-items: center;
   justify-content: flex-start;
   gap: 0.75rem;
-  flex-wrap: wrap;
-  flex: 1 1 16rem;
+  flex-wrap: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .page-jump-row {
@@ -421,8 +506,8 @@ th {
   align-items: center;
   justify-content: flex-end;
   gap: 0.75rem;
-  flex-wrap: wrap;
-  flex: 1 1 16rem;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
 }
 
 .page-jump {
@@ -433,6 +518,29 @@ th {
 
 .page-jump input {
   width: 4.5rem;
+}
+
+.page-arrow {
+  position: relative;
+  min-width: 2.5rem;
+  color: transparent;
+}
+
+.page-arrow::before {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.page-arrow-prev::before {
+  content: '\25C0';
+}
+
+.page-arrow-next::before {
+  content: '\25B6';
 }
 
 .section-gap {
@@ -463,6 +571,35 @@ th {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+}
+
+.singer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.singer-list-item + .singer-list-item {
+  border-top: 1px solid var(--color-border);
+}
+
+.singer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+}
+
+.singer-result-button {
+  width: 100%;
+  border: 0;
+  padding-inline: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.singer-result-button:hover {
+  border-color: transparent;
 }
 
 .playlist-row .song-meta {
@@ -534,11 +671,17 @@ th {
     display: none;
   }
 
+  .pagination-stack {
+    flex-wrap: wrap;
+  }
+
   .pagination-bar {
     justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .page-jump-row {
     justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }

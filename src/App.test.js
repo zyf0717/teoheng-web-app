@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const {
   searchSongs,
   fetchPlaylist,
+  fetchSingers,
   queueSong,
   prioritizeSong,
   deleteSong,
@@ -22,6 +23,7 @@ const {
 } = vi.hoisted(() => ({
   searchSongs: vi.fn(),
   fetchPlaylist: vi.fn(),
+  fetchSingers: vi.fn(),
   queueSong: vi.fn(),
   prioritizeSong: vi.fn(),
   deleteSong: vi.fn(),
@@ -44,6 +46,7 @@ vi.mock('./lib/kodApi', () => ({
   DEFAULT_LANG: '\u56fd\u8bed',
   deleteSong,
   fetchPlaylist,
+  fetchSingers,
   micDown,
   micUp,
   prioritizeSong,
@@ -99,10 +102,32 @@ function buildPlaylistResponse() {
   }
 }
 
+function buildSingerResponse() {
+  return {
+    page: 0,
+    maxPage: 10515,
+    number: 2,
+    singers: [
+      {
+        name: '\u5468\u6770\u4f26',
+        picture: '27356.jpg',
+      },
+      {
+        name: '\u5218\u5fb7\u534e',
+        picture: '26554.jpg',
+      },
+    ],
+    raw: { page: 0 },
+  }
+}
+
 describe('App', () => {
   beforeEach(() => {
+    window.localStorage.clear()
+
     searchSongs.mockReset()
     fetchPlaylist.mockReset()
+    fetchSingers.mockReset()
     queueSong.mockReset()
     prioritizeSong.mockReset()
     deleteSong.mockReset()
@@ -121,6 +146,7 @@ describe('App', () => {
 
     searchSongs.mockResolvedValue(buildSearchResponse())
     fetchPlaylist.mockResolvedValue(buildPlaylistResponse())
+    fetchSingers.mockResolvedValue(buildSingerResponse())
     queueSong.mockResolvedValue({ cmd: 'Add1', code: '0' })
     prioritizeSong.mockResolvedValue({ cmd: 'Pro1', code: '0' })
     deleteSong.mockResolvedValue({ cmd: 'Del1', code: '0' })
@@ -145,8 +171,10 @@ describe('App', () => {
 
     expect(searchSongs).toHaveBeenCalledTimes(1)
     expect(fetchPlaylist).toHaveBeenCalledTimes(1)
+    expect(fetchSingers).toHaveBeenCalledTimes(1)
     expect(wrapper.text()).toContain('Lucky')
     expect(wrapper.text()).toContain('Ten Years')
+    expect(wrapper.text()).toContain('\u5468\u6770\u4f26')
 
     wrapper.unmount()
   })
@@ -168,14 +196,18 @@ describe('App', () => {
     await flushPromises()
     await wrapper.get('summary.filter-summary').trigger('click')
     await wrapper.get('input[placeholder="Song title"]').setValue('Later')
-    await wrapper.get('input[placeholder="Singer name"]').setValue('Rene')
-    await wrapper.get('select').setValue('\u82f1\u8bed')
-    await wrapper.get('button.button-secondary').trigger('click')
+    await wrapper.get('[data-test="search-singer"]').setValue('Eason')
+    await wrapper.get('[data-test="search-language"]').setValue('\u82f1\u8bed')
+    await wrapper.get('[data-test="search-song-type"]').setValue('\u5bf9\u5531')
+    await wrapper.get('[data-test="search-sort-type"]').setValue('TopByNewSong')
+    await wrapper.get('[data-test="search-reset"]').trigger('click')
     await flushPromises()
 
     expect(wrapper.get('input[placeholder="Song title"]').element.value).toBe('')
-    expect(wrapper.get('input[placeholder="Singer name"]').element.value).toBe('')
-    expect(wrapper.get('select').element.value).toBe('\u5168\u90e8')
+    expect(wrapper.get('[data-test="search-singer"]').element.value).toBe('')
+    expect(wrapper.get('[data-test="search-language"]').element.value).toBe('')
+    expect(wrapper.get('[data-test="search-song-type"]').element.value).toBe('')
+    expect(wrapper.get('[data-test="search-sort-type"]').element.value).toBe('')
 
     wrapper.unmount()
   })
@@ -184,13 +216,134 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    const mobileTabs = wrapper.findAll('button.mobile-tab')
     const mobilePanels = wrapper.findAll('section.mobile-panel')
-    await mobileTabs[1].trigger('click')
+    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
 
-    expect(wrapper.text()).toContain('Playlist')
-    expect(mobilePanels[1].classes()).not.toContain('mobile-panel-hidden')
+    expect(wrapper.text()).toContain('Singer')
+    expect(mobilePanels[2].classes()).not.toContain('mobile-panel-hidden')
     expect(mobilePanels[0].classes()).toContain('mobile-panel-hidden')
+
+    wrapper.unmount()
+  })
+
+  it('pages singer results independently', async () => {
+    fetchSingers
+      .mockResolvedValueOnce(buildSingerResponse())
+      .mockResolvedValueOnce({
+        page: 1,
+        maxPage: 10515,
+        number: 2,
+        singers: [
+          {
+            name: '\u8c2d\u548f\u9e9f',
+            picture: '26971.jpg',
+          },
+          {
+            name: '\u5f20\u5b66\u53cb',
+            picture: '27426.jpg',
+          },
+        ],
+        raw: { page: 1 },
+      })
+
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="singer-page-input"]').setValue(2)
+    await wrapper.get('[data-test="singer-page-go"]').trigger('click')
+    await flushPromises()
+
+    expect(fetchSingers).toHaveBeenLastCalledWith(
+      'http://192.168.0.8:8080',
+      expect.objectContaining({ page: 1, singerType: '\u5168\u90e8' }),
+    )
+    expect(wrapper.text()).toContain('\u8c2d\u548f\u9e9f')
+
+    wrapper.unmount()
+  })
+
+  it('searches singers with the selected country filter', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="singer-search-name"]').setValue('\u5468')
+    await wrapper.get('[data-test="singer-search-country"]').setValue('\u5927\u9646')
+    await wrapper.get('[data-test="singer-search-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(fetchSingers).toHaveBeenLastCalledWith(
+      'http://192.168.0.8:8080',
+      expect.objectContaining({
+        singer: '\u5468',
+        singerType: '\u5927\u9646',
+        page: 0,
+      }),
+    )
+
+    wrapper.unmount()
+  })
+
+  it('pages singer results with the next arrow', async () => {
+    fetchSingers
+      .mockResolvedValueOnce(buildSingerResponse())
+      .mockResolvedValueOnce({
+        page: 1,
+        maxPage: 10515,
+        number: 2,
+        singers: [
+          {
+            name: '\u8c2d\u548f\u9e9f',
+            picture: '26971.jpg',
+          },
+          {
+            name: '\u5f20\u5b66\u53cb',
+            picture: '27426.jpg',
+          },
+        ],
+        raw: { page: 1 },
+      })
+
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="singer-page-next"]').trigger('click')
+    await flushPromises()
+
+    expect(fetchSingers).toHaveBeenLastCalledWith(
+      'http://192.168.0.8:8080',
+      expect.objectContaining({ page: 1, singerType: '\u5168\u90e8' }),
+    )
+    expect(wrapper.text()).toContain('\u8c2d\u548f\u9e9f')
+
+    wrapper.unmount()
+  })
+
+  it('moves from a singer result into a top hits singer search', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    const mobilePanels = wrapper.findAll('section.mobile-panel')
+    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="singer-result-\u5468\u6770\u4f26"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.get('[data-test="search-singer"]').element.value).toBe('\u5468\u6770\u4f26')
+    expect(searchSongs).toHaveBeenLastCalledWith(
+      'http://192.168.0.8:8080',
+      expect.objectContaining({
+        singer: '\u5468\u6770\u4f26',
+        songName: '',
+        songType: '',
+        sortType: '',
+        lang: '',
+        page: 0,
+      }),
+    )
+    expect(mobilePanels[1].classes()).not.toContain('mobile-panel-hidden')
+    expect(mobilePanels[2].classes()).toContain('mobile-panel-hidden')
 
     wrapper.unmount()
   })
@@ -204,6 +357,26 @@ describe('App', () => {
 
     expect(queueSong).toHaveBeenCalledWith('http://192.168.0.8:8080', '9029901')
     expect(fetchPlaylist).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('searches songs with the singer filter', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.get('summary.filter-summary').trigger('click')
+    await wrapper.get('[data-test="search-singer"]').setValue('Eason')
+    await wrapper.get('[data-test="search-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(searchSongs).toHaveBeenLastCalledWith(
+      'http://192.168.0.8:8080',
+      expect.objectContaining({
+        singer: 'Eason',
+        page: 0,
+      }),
+    )
 
     wrapper.unmount()
   })
@@ -313,6 +486,8 @@ describe('App', () => {
   })
 
   it('sends mic up from the command bar and refreshes the playlist', async () => {
+    window.localStorage.setItem('open-kod-mic-controlled', 'true')
+
     const wrapper = mount(App)
 
     await flushPromises()
@@ -326,6 +501,8 @@ describe('App', () => {
   })
 
   it('sends mic down from the command bar and refreshes the playlist', async () => {
+    window.localStorage.setItem('open-kod-mic-controlled', 'true')
+
     const wrapper = mount(App)
 
     await flushPromises()
@@ -334,6 +511,29 @@ describe('App', () => {
 
     expect(micDown).toHaveBeenCalledWith('http://192.168.0.8:8080')
     expect(fetchPlaylist).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('disables mic volume buttons until KOD microphone control is enabled', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+
+    expect(wrapper.get('[data-test="command-mic-up"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-test="command-mic-down"]').attributes('disabled')).toBeDefined()
+
+    wrapper.unmount()
+  })
+
+  it('enables mic volume buttons when the KOD microphone toggle is switched on', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.findAll('[data-test="mic-controlled-toggle"]')[0].trigger('click')
+
+    expect(wrapper.get('[data-test="command-mic-up"]').attributes('disabled')).toBeUndefined()
+    expect(wrapper.get('[data-test="command-mic-down"]').attributes('disabled')).toBeUndefined()
 
     wrapper.unmount()
   })

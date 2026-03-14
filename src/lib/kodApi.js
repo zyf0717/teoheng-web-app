@@ -74,6 +74,13 @@ function normalizePlaylistSong(song) {
   }
 }
 
+function normalizeSinger(song) {
+  return {
+    name: song.name ?? '',
+    picture: song.picture ?? '',
+  }
+}
+
 export async function searchSongs(baseUrl, params) {
   const payload = await jsonp(baseUrl, 'SearchServlet', params)
 
@@ -159,6 +166,18 @@ export async function fetchPlaylist(baseUrl) {
     stateMuOr: payload.stateMuOr,
     number: Number(payload.number ?? payload.songList?.length ?? 0),
     songs: Array.isArray(payload.songList) ? payload.songList.map(normalizePlaylistSong) : [],
+    raw: payload,
+  }
+}
+
+export async function fetchSingers(baseUrl, params) {
+  const payload = await jsonp(baseUrl, 'SingerServlet', params)
+
+  return {
+    page: Number(payload.page ?? params.page ?? 0),
+    maxPage: Number.isFinite(Number(payload.maxPage)) ? Number(payload.maxPage) : null,
+    number: Number(payload.number ?? payload.singerList?.length ?? 0),
+    singers: Array.isArray(payload.singerList) ? payload.singerList.map(normalizeSinger) : [],
     raw: payload,
   }
 }
