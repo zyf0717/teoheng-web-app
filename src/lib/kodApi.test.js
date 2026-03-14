@@ -5,12 +5,17 @@ import {
   deleteSong,
   fetchPlaylist,
   jsonp,
+  micDown,
+  micUp,
   musicDown,
   musicUp,
   prioritizeSong,
   queueSong,
   restartDevice,
   searchSongs,
+  toneDown,
+  toneReset,
+  toneUp,
   toggleMute,
   toggleVocals,
 } from './kodApi'
@@ -89,6 +94,70 @@ describe('kodApi', () => {
     })
 
     expect(document.body.querySelector('script')).toBeNull()
+  })
+
+  it('preserves singerPic filenames from search responses', async () => {
+    const resultPromise = searchSongs(DEFAULT_BASE_URL, {
+      lang: '\u5168\u90e8',
+      page: 0,
+    })
+
+    resolveJsonpRequest({
+      maxPage: 1,
+      number: 1,
+      page: 0,
+      songList: [
+        {
+          cLOUD: 0,
+          sINGER: 'Hebe',
+          sINGERPIC: '26940.jpg',
+          sONGBM: '9029901',
+          sONGNAME: 'Small Lucky',
+        },
+      ],
+    })
+
+    await expect(resultPromise).resolves.toEqual({
+      maxPage: 1,
+      number: 1,
+      page: 0,
+      raw: {
+        maxPage: 1,
+        number: 1,
+        page: 0,
+        songList: [
+          {
+            cLOUD: 0,
+            sINGER: 'Hebe',
+            sINGERPIC: '26940.jpg',
+            sONGBM: '9029901',
+            sONGNAME: 'Small Lucky',
+          },
+        ],
+      },
+      songs: [
+        {
+          cloud: false,
+          id: '9029901',
+          name: 'Small Lucky',
+          singer: 'Hebe',
+          singerPic: '26940.jpg',
+        },
+      ],
+    })
+  })
+
+  it('uses the base URL correctly when it already has a trailing slash', async () => {
+    const commandPromise = queueSong('http://192.168.0.8:8080/', '9029901')
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.origin).toBe('http://192.168.0.8:8080')
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmdValue')).toBe('9029901')
+
+    resolveJsonpRequest({ cmd: 'Add1', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Add1', code: '0' })
   })
 
   it('sends the Add1 command with the selected song id', async () => {
@@ -189,6 +258,66 @@ describe('kodApi', () => {
     resolveJsonpRequest({ cmd: 'Music_down', code: '0' })
 
     await expect(commandPromise).resolves.toEqual({ cmd: 'Music_down', code: '0' })
+  })
+
+  it('sends the Mic_up command without a song id', async () => {
+    const commandPromise = micUp(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Mic_up')
+
+    resolveJsonpRequest({ cmd: 'Mic_up', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Mic_up', code: '0' })
+  })
+
+  it('sends the Mic_down command without a song id', async () => {
+    const commandPromise = micDown(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Mic_down')
+
+    resolveJsonpRequest({ cmd: 'Mic_down', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Mic_down', code: '0' })
+  })
+
+  it('sends the Tone_nom command without a song id', async () => {
+    const commandPromise = toneReset(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Tone_nom')
+
+    resolveJsonpRequest({ cmd: 'Tone_nom', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Tone_nom', code: '0' })
+  })
+
+  it('sends the Tone_down command without a song id', async () => {
+    const commandPromise = toneDown(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Tone_down')
+
+    resolveJsonpRequest({ cmd: 'Tone_down', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Tone_down', code: '0' })
+  })
+
+  it('sends the Tone_up command without a song id', async () => {
+    const commandPromise = toneUp(DEFAULT_BASE_URL)
+    const requestUrl = new URL(getInjectedScript().src)
+
+    expect(requestUrl.pathname).toBe('/CommandServlet')
+    expect(requestUrl.searchParams.get('cmd')).toBe('Tone_up')
+
+    resolveJsonpRequest({ cmd: 'Tone_up', code: '0' })
+
+    await expect(commandPromise).resolves.toEqual({ cmd: 'Tone_up', code: '0' })
   })
 
   it('normalizes playlist data from PlaylistServlet', async () => {

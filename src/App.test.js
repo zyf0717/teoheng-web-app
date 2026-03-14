@@ -7,11 +7,16 @@ const {
   queueSong,
   prioritizeSong,
   deleteSong,
+  micDown,
+  micUp,
   toggleVocals,
   restartDevice,
   toggleMute,
   musicUp,
   musicDown,
+  toneReset,
+  toneDown,
+  toneUp,
 } = vi.hoisted(() => ({
   searchSongs: vi.fn(),
   fetchPlaylist: vi.fn(),
@@ -23,6 +28,11 @@ const {
   toggleMute: vi.fn(),
   musicUp: vi.fn(),
   musicDown: vi.fn(),
+  micUp: vi.fn(),
+  micDown: vi.fn(),
+  toneReset: vi.fn(),
+  toneDown: vi.fn(),
+  toneUp: vi.fn(),
 }))
 
 vi.mock('./lib/kodApi', () => ({
@@ -30,12 +40,17 @@ vi.mock('./lib/kodApi', () => ({
   DEFAULT_LANG: '\u56fd\u8bed',
   deleteSong,
   fetchPlaylist,
+  micDown,
+  micUp,
   prioritizeSong,
   queueSong,
   restartDevice,
   searchSongs,
   musicDown,
   musicUp,
+  toneDown,
+  toneReset,
+  toneUp,
   toggleMute,
   toggleVocals,
 }))
@@ -53,6 +68,7 @@ function buildSearchResponse() {
         name: 'Lucky',
         singer: 'Tester',
         cloud: false,
+        singerPic: '26940.jpg',
       },
     ],
     raw: { page: 0 },
@@ -89,6 +105,11 @@ describe('App', () => {
     toggleMute.mockReset()
     musicUp.mockReset()
     musicDown.mockReset()
+    micUp.mockReset()
+    micDown.mockReset()
+    toneReset.mockReset()
+    toneDown.mockReset()
+    toneUp.mockReset()
 
     searchSongs.mockResolvedValue(buildSearchResponse())
     fetchPlaylist.mockResolvedValue(buildPlaylistResponse())
@@ -100,6 +121,11 @@ describe('App', () => {
     toggleMute.mockResolvedValue({ cmd: 'Mute', code: '0' })
     musicUp.mockResolvedValue({ cmd: 'Music_up', code: '0' })
     musicDown.mockResolvedValue({ cmd: 'Music_down', code: '0' })
+    micUp.mockResolvedValue({ cmd: 'Mic_up', code: '0' })
+    micDown.mockResolvedValue({ cmd: 'Mic_down', code: '0' })
+    toneReset.mockResolvedValue({ cmd: 'Tone_nom', code: '0' })
+    toneDown.mockResolvedValue({ cmd: 'Tone_down', code: '0' })
+    toneUp.mockResolvedValue({ cmd: 'Tone_up', code: '0' })
   })
 
   it('loads search results and playlist items on mount', async () => {
@@ -111,6 +137,50 @@ describe('App', () => {
     expect(fetchPlaylist).toHaveBeenCalledTimes(1)
     expect(wrapper.text()).toContain('Lucky')
     expect(wrapper.text()).toContain('Ten Years')
+
+    wrapper.unmount()
+  })
+
+  it('renders singer image URLs from the active base URL', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+
+    const image = wrapper.get('img.singer-icon')
+    expect(image.attributes('src')).toBe('http://192.168.0.8:8080/singer/26940.jpg')
+
+    wrapper.unmount()
+  })
+
+  it('resets search fields back to defaults', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.get('summary.filter-summary').trigger('click')
+    await wrapper.get('input[placeholder="Song title"]').setValue('Later')
+    await wrapper.get('input[placeholder="Singer name"]').setValue('Rene')
+    await wrapper.get('select').setValue('\u82f1\u8bed')
+    await wrapper.get('button.button-secondary').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.get('input[placeholder="Song title"]').element.value).toBe('')
+    expect(wrapper.get('input[placeholder="Singer name"]').element.value).toBe('')
+    expect(wrapper.get('select').element.value).toBe('\u5168\u90e8')
+
+    wrapper.unmount()
+  })
+
+  it('switches between mobile tabs', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    const mobileTabs = wrapper.findAll('button.mobile-tab')
+    const mobilePanels = wrapper.findAll('section.mobile-panel')
+    await mobileTabs[1].trigger('click')
+
+    expect(wrapper.text()).toContain('Playlist')
+    expect(mobilePanels[1].classes()).not.toContain('mobile-panel-hidden')
+    expect(mobilePanels[0].classes()).toContain('mobile-panel-hidden')
 
     wrapper.unmount()
   })
@@ -193,6 +263,69 @@ describe('App', () => {
     wrapper.unmount()
   })
 
+  it('sends tone reset from the command bar and refreshes the playlist', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.get('[data-test="command-tone-reset"]').trigger('click')
+    await flushPromises()
+
+    expect(toneReset).toHaveBeenCalledWith('http://192.168.0.8:8080')
+    expect(fetchPlaylist).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('sends mic up from the command bar and refreshes the playlist', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.get('[data-test="command-mic-up"]').trigger('click')
+    await flushPromises()
+
+    expect(micUp).toHaveBeenCalledWith('http://192.168.0.8:8080')
+    expect(fetchPlaylist).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('sends mic down from the command bar and refreshes the playlist', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.get('[data-test="command-mic-down"]').trigger('click')
+    await flushPromises()
+
+    expect(micDown).toHaveBeenCalledWith('http://192.168.0.8:8080')
+    expect(fetchPlaylist).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('prevents duplicate global command calls while a command is in flight', async () => {
+    let resolveCommand
+    toggleMute.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveCommand = resolve
+        }),
+    )
+
+    const wrapper = mount(App)
+
+    await flushPromises()
+    const muteButton = wrapper.get('[data-test="command-mute"]')
+    await muteButton.trigger('click')
+    await muteButton.trigger('click')
+
+    expect(toggleMute).toHaveBeenCalledTimes(1)
+
+    resolveCommand({ cmd: 'Mute', code: '0' })
+    await flushPromises()
+
+    wrapper.unmount()
+  })
+
   it('saves the edited base URL before running new requests', async () => {
     const wrapper = mount(App)
 
@@ -210,4 +343,18 @@ describe('App', () => {
 
     wrapper.unmount()
   })
+
+  it('normalizes saved base URLs with a trailing slash before using singer images', async () => {
+    window.localStorage.setItem('open-kod-base-url', 'http://10.0.0.20:8080/')
+
+    const wrapper = mount(App)
+
+    await flushPromises()
+
+    const image = wrapper.get('img.singer-icon')
+    expect(image.attributes('src')).toBe('http://10.0.0.20:8080/singer/26940.jpg')
+
+    wrapper.unmount()
+  })
+
 })

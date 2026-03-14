@@ -4,12 +4,17 @@ import {
   DEFAULT_BASE_URL,
   deleteSong,
   fetchPlaylist,
+  micDown,
+  micUp,
   musicDown,
   musicUp,
   prioritizeSong,
   queueSong,
   restartDevice,
   searchSongs,
+  toneDown,
+  toneReset,
+  toneUp,
   toggleMute,
   toggleVocals,
 } from './lib/kodApi'
@@ -30,6 +35,7 @@ const autoRefresh = ref(true)
 const pageInput = ref(1)
 const activeMobileTab = ref('search')
 const commandBarBusy = ref(false)
+const commandBarRef = ref(null)
 
 const searchForm = reactive({
   songName: '',
@@ -55,6 +61,7 @@ const playlistState = reactive({
 })
 
 let pollHandle = null
+let commandBarResizeObserver = null
 
 const displayPage = computed(() => searchState.page + 1)
 
@@ -66,7 +73,7 @@ function resetSearch() {
   searchForm.sortType = ''
   searchState.page = 0
   pageInput.value = 1
-  searchState.status = 'Search form reset.'
+  runSearch()
 }
 
 function resolveBaseUrl(value) {
@@ -240,6 +247,14 @@ function syncPolling() {
   }
 }
 
+function updateCommandBarOffset() {
+  const height = commandBarRef.value
+    ? Math.ceil(commandBarRef.value.getBoundingClientRect().height)
+    : 0
+
+  document.documentElement.style.setProperty('--command-bar-offset', `${height + 16}px`)
+}
+
 watch(autoRefresh, () => {
   syncPolling()
 })
@@ -248,21 +263,36 @@ onMounted(() => {
   syncPolling()
   runSearch()
   refreshPlaylist()
+  updateCommandBarOffset()
+
+  if (typeof ResizeObserver !== 'undefined' && commandBarRef.value) {
+    commandBarResizeObserver = new ResizeObserver(() => {
+      updateCommandBarOffset()
+    })
+    commandBarResizeObserver.observe(commandBarRef.value)
+  }
+
+  window.addEventListener('resize', updateCommandBarOffset)
 })
 
 onBeforeUnmount(() => {
   if (pollHandle) {
     window.clearInterval(pollHandle)
   }
+
+  if (commandBarResizeObserver) {
+    commandBarResizeObserver.disconnect()
+  }
+
+  window.removeEventListener('resize', updateCommandBarOffset)
 })
 </script>
 
 <template>
   <main class="app-shell">
-    <section class="hero-panel panel">
+    <section class="hero-panel panel desktop-only">
       <header class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Vue + Vite proof of concept</p>
           <h1>Open KOD</h1>
           <p class="subtitle">
             Search songs, queue tracks, and monitor the current playlist from one page.
@@ -290,6 +320,15 @@ onBeforeUnmount(() => {
       <button
         type="button"
         class="mobile-tab"
+        :class="{ 'mobile-tab-active': activeMobileTab === 'start' }"
+        :aria-selected="activeMobileTab === 'start'"
+        @click="activeMobileTab = 'start'"
+      >
+        Start
+      </button>
+      <button
+        type="button"
+        class="mobile-tab"
         :class="{ 'mobile-tab-active': activeMobileTab === 'search' }"
         :aria-selected="activeMobileTab === 'search'"
         @click="activeMobileTab = 'search'"
@@ -308,11 +347,34 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="main-panels section-gap">
+      <section class="panel stack mobile-panel mobile-only" :class="{ 'mobile-panel-hidden': activeMobileTab !== 'start' }">
+        <div class="hero-copy">
+          <h1>Open KOD</h1>
+          <p class="subtitle">
+            Search songs, queue tracks, and monitor the current playlist from one page.
+          </p>
+        </div>
+
+        <form class="stack" @submit.prevent="saveBaseUrl">
+          <label>
+            Device base URL
+            <input
+              v-model="baseUrlInput"
+              data-test="base-url-input"
+              type="url"
+              placeholder="http://192.168.0.8:8080"
+            />
+          </label>
+          <div class="toolbar">
+            <button data-test="save-base-url" type="button" @click="saveBaseUrl">Save</button>
+          </div>
+        </form>
+      </section>
+
       <section class="panel stack mobile-panel" :class="{ 'mobile-panel-hidden': activeMobileTab !== 'search' }">
-        <div class="section-heading">
+        <div class="section-heading panel-heading">
           <div>
             <h2>Song Search</h2>
-            <p>{{ searchState.status }}</p>
           </div>
         </div>
 
@@ -343,11 +405,13 @@ onBeforeUnmount(() => {
               Sort type
               <input v-model="searchForm.sortType" type="text" placeholder="Optional" />
             </label>
-            <div class="toolbar align-end">
+            <div class="filter-actions">
               <button data-test="search-submit" type="submit" :disabled="searchState.loading">
-                {{ searchState.loading ? 'Searching...' : 'Search' }}
+                Search
               </button>
-              <button type="button" class="button-secondary" @click="resetSearch">Reset</button>
+              <button type="button" class="button-secondary" :disabled="searchState.loading" @click="resetSearch">
+                Reset
+              </button>
             </div>
           </form>
         </details>
@@ -357,7 +421,7 @@ onBeforeUnmount(() => {
             <thead>
               <tr>
                 <th></th>
-                <th>Song</th>
+                <th></th>
                 <th></th>
               </tr>
             </thead>
@@ -386,10 +450,10 @@ onBeforeUnmount(() => {
                   <button
                     :data-test="`promote-song-${song.id}`"
                     type="button"
-                    class="button-secondary button-command"
+                    class="button-secondary button-command button-emoji"
                     @click="promoteSong(song.id)"
                   >
-                    Prioritize
+                    ⏫
                   </button>
                   <button
                     :data-test="`add-song-${song.id}`"
@@ -397,7 +461,7 @@ onBeforeUnmount(() => {
                     class="button-secondary button-command"
                     @click="addSong(song.id)"
                   >
-                    Add<span v-if="song.cloud" class="button-cloud"> ({{ CLOUD_MARKER }})</span>
+                    ➕<span v-if="song.cloud" class="button-cloud"> ({{ CLOUD_MARKER }})</span>
                   </button>
                 </td>
               </tr>
@@ -433,10 +497,9 @@ onBeforeUnmount(() => {
       </section>
 
       <section class="panel stack mobile-panel" :class="{ 'mobile-panel-hidden': activeMobileTab !== 'playlist' }">
-        <div class="section-heading">
+        <div class="section-heading panel-heading">
           <div>
             <h2>Playlist</h2>
-            <p>{{ playlistState.number }} item(s) returned.</p>
           </div>
           <div class="toolbar">
             <label class="checkbox">
@@ -457,25 +520,28 @@ onBeforeUnmount(() => {
         <ol v-if="playlistState.songs.length" class="playlist">
           <li v-for="song in playlistState.songs" :key="`${song.id}-${song.name}`">
             <div class="playlist-row">
-              <span>
-                <strong>{{ song.name }}</strong> by {{ song.singer }}
-              </span>
+              <div class="song-meta">
+                <div class="song-title-row">
+                  <strong>{{ song.name }}</strong>
+                </div>
+                <div class="song-artist">{{ song.singer }}</div>
+              </div>
               <div class="action-cell">
                 <button
                   :data-test="`playlist-promote-song-${song.id}`"
                   type="button"
-                  class="button-secondary button-command"
+                  class="button-secondary button-command button-emoji"
                   @click="promoteSong(song.id)"
                 >
-                  TOP
+                  ⏫
                 </button>
                 <button
                   :data-test="`delete-song-${song.id}`"
                   type="button"
-                  class="button-secondary button-danger"
+                  class="button-secondary button-danger button-emoji"
                   @click="removeSong(song.id)"
                 >
-                  DEL
+                  ⛔
                 </button>
               </div>
             </div>
@@ -486,23 +552,48 @@ onBeforeUnmount(() => {
     </div>
   </main>
 
-  <div class="command-bar">
+  <div ref="commandBarRef" class="command-bar">
     <div class="command-bar-inner">
       <button data-test="command-reset" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(restartDevice)">
-        Restart
-      </button>
-      <button data-test="command-mute" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(toggleMute)">
-        Mute
+        Replay
       </button>
       <button data-test="command-vocals" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(toggleVocals)">
         Vocals
       </button>
-      <button data-test="command-music-down" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(musicDown)">
-        Music -
-      </button>
-      <button data-test="command-music-up" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(musicUp)">
-        Music +
-      </button>
+      <div class="command-group">
+        <span class="command-group-label">Pitch</span>
+        <div class="command-group-buttons">
+          <button data-test="command-tone-down" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(toneDown)">
+            ♭
+          </button>
+          <button data-test="command-tone-reset" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(toneReset)">
+            ♮
+          </button>
+          <button data-test="command-tone-up" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(toneUp)">
+            ♯
+          </button>
+        </div>
+      </div>
+      <div class="command-group">
+        <span class="command-group-label">Volume</span>
+        <div class="command-group-buttons">
+          <button data-test="command-mute" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(toggleMute)">
+            🔇
+          </button>
+          <button data-test="command-music-down" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(musicDown)">
+            🔉
+          </button>
+          <button data-test="command-music-up" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(musicUp)">
+            🔊
+          </button>
+          <button data-test="command-mic-down" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(micDown)">
+            🎤-
+          </button>
+          <button data-test="command-mic-up" type="button" :disabled="commandBarBusy" @click="runGlobalCommand(micUp)">
+            🎤+
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

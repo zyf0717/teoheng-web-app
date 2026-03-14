@@ -118,6 +118,26 @@ export async function musicDown(baseUrl) {
   return sendCommand(baseUrl, 'Music_down')
 }
 
+export async function micUp(baseUrl) {
+  return sendCommand(baseUrl, 'Mic_up')
+}
+
+export async function micDown(baseUrl) {
+  return sendCommand(baseUrl, 'Mic_down')
+}
+
+export async function toneReset(baseUrl) {
+  return sendCommand(baseUrl, 'Tone_nom')
+}
+
+export async function toneDown(baseUrl) {
+  return sendCommand(baseUrl, 'Tone_down')
+}
+
+export async function toneUp(baseUrl) {
+  return sendCommand(baseUrl, 'Tone_up')
+}
+
 export async function fetchPlaylist(baseUrl) {
   const payload = await jsonp(baseUrl, 'PlaylistServlet', {
     onSelectPage: true,
