@@ -86,6 +86,14 @@ function resolveBaseUrl(value) {
   return value.trim() || DEFAULT_BASE_URL
 }
 
+function singerImageUrl(fileName) {
+  if (!fileName) {
+    return ''
+  }
+
+  return new URL(`singer/${fileName}`, `${resolveBaseUrl(activeBaseUrl.value).replace(/\/+$/, '')}/`).toString()
+}
+
 async function runSearch() {
   searchState.loading = true
   searchState.status = `Searching page ${displayPage.value}...`
@@ -288,7 +296,7 @@ onBeforeUnmount(() => {
           />
         </label>
         <div class="toolbar">
-          <button data-test="save-base-url" type="submit">Save</button>
+          <button data-test="save-base-url" type="button" @click="saveBaseUrl">Save</button>
         </div>
       </form>
     </header>
@@ -358,15 +366,29 @@ onBeforeUnmount(() => {
               <tr>
                 <th>Song</th>
                 <th>Singer</th>
-                <th>Cloud</th>
                 <th></th>
               </tr>
             </thead>
             <tbody v-if="searchState.songs.length">
               <tr v-for="song in searchState.songs" :key="song.id">
-                <td>{{ song.name }}</td>
-                <td>{{ song.singer }}</td>
-                <td>{{ song.cloud ? 'Yes' : 'No' }}</td>
+                <td>
+                  <div class="song-title-row">
+                    <span>{{ song.name }}</span>
+                    <span v-if="song.cloud" class="cloud-marker">(☁)</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="singer-cell">
+                    <span>{{ song.singer }}</span>
+                    <img
+                      v-if="song.singerPic"
+                      :src="singerImageUrl(song.singerPic)"
+                      :alt="`${song.singer} portrait`"
+                      class="singer-icon"
+                      loading="lazy"
+                    />
+                  </div>
+                </td>
                 <td class="action-cell">
                   <button
                     :data-test="`promote-song-${song.id}`"
@@ -389,7 +411,7 @@ onBeforeUnmount(() => {
             </tbody>
             <tbody v-else>
               <tr>
-                <td colspan="4" class="empty">No results yet.</td>
+                <td colspan="3" class="empty">No results yet.</td>
               </tr>
             </tbody>
           </table>

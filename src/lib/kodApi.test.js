@@ -238,10 +238,11 @@ describe('kodApi', () => {
     vi.useFakeTimers()
 
     const requestPromise = jsonp(DEFAULT_BASE_URL, 'SearchServlet', { page: 0 })
+    const rejection = expect(requestPromise).rejects.toThrow('Request timed out for SearchServlet')
 
     await vi.advanceTimersByTimeAsync(10000)
 
-    await expect(requestPromise).rejects.toThrow('Request timed out for SearchServlet')
+    await rejection
     expect(document.body.querySelector('script')).toBeNull()
   })
 })

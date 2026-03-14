@@ -61,6 +61,7 @@ function normalizeSearchSong(song) {
     id: song.sONGBM ?? '',
     name: song.sONGNAME ?? '',
     singer: song.sINGER ?? '',
+    singerPic: song.sINGERPIC ?? '',
     cloud: Number(song.cLOUD) === 1,
   }
 }
