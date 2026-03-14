@@ -21,7 +21,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -43,7 +44,8 @@ button:disabled {
   opacity: 0.7;
 }
 
-input {
+input,
+select {
   width: 100%;
   border: 1px solid #d0d7de;
   border-radius: 8px;
@@ -131,6 +133,41 @@ p {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
+.filter-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.filter-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.filter-summary::-webkit-details-marker {
+  display: none;
+}
+
+.filter-summary::after {
+  content: '▸';
+  color: #64748b;
+  transition: transform 0.2s ease;
+}
+
+.filter-panel[open] .filter-summary::after {
+  transform: rotate(90deg);
+}
+
+.filter-form {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
 .align-end {
   align-items: end;
 }
@@ -140,7 +177,7 @@ p {
 }
 
 .button-command {
-  min-width: 3.5rem;
+  min-width: 5.75rem;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
 }
@@ -214,7 +251,7 @@ th {
 
 .song-title-row,
 .singer-cell {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.4rem;
 }
@@ -224,9 +261,20 @@ th {
   font-size: 0.9rem;
 }
 
+.song-meta {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 3.5rem;
+  align-content: center;
+}
+
+.song-artist {
+  color: #64748b;
+}
+
 .singer-icon {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 3.5rem;
+  height: 3.5rem;
   border-radius: 999px;
   object-fit: cover;
   border: 1px solid #d0d7de;
@@ -275,21 +323,6 @@ th {
 
 .checkbox input {
   width: auto;
-}
-
-.pill-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  background: #f1f5f9;
-  color: #334155;
 }
 
 .playlist {

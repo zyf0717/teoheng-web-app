@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import {
   DEFAULT_BASE_URL,
-  DEFAULT_LANG,
   deleteSong,
   fetchPlaylist,
   musicDown,
@@ -17,6 +16,13 @@ import {
 
 const POLL_INTERVAL_MS = 5000
 const STORAGE_KEY = 'open-kod-base-url'
+const CLOUD_MARKER = '(\u2601)'
+const LANGUAGE_OPTIONS = [
+  { label: 'All', value: '\u5168\u90e8' },
+  { label: 'Mandarin', value: '\u56fd\u8bed' },
+  { label: 'Cantonese', value: '\u7ca4\u8bed' },
+  { label: 'English', value: '\u82f1\u8bed' },
+]
 
 const activeBaseUrl = ref(window.localStorage.getItem(STORAGE_KEY) || DEFAULT_BASE_URL)
 const baseUrlInput = ref(activeBaseUrl.value)
@@ -28,7 +34,7 @@ const commandBarBusy = ref(false)
 const searchForm = reactive({
   songName: '',
   singer: '',
-  lang: DEFAULT_LANG,
+  lang: LANGUAGE_OPTIONS[0].value,
   songType: '',
   sortType: '',
 })
@@ -45,10 +51,6 @@ const searchState = reactive({
 const playlistState = reactive({
   loading: false,
   number: 0,
-  hasChange: null,
-  statePlay: null,
-  stateMute: null,
-  stateMuOr: null,
   songs: [],
 })
 
@@ -56,25 +58,10 @@ let pollHandle = null
 
 const displayPage = computed(() => searchState.page + 1)
 
-const playlistFlags = computed(() => [
-  `Play: ${formatFlag(playlistState.statePlay)}`,
-  `Mute: ${formatFlag(playlistState.stateMute)}`,
-  `MuOr: ${formatFlag(playlistState.stateMuOr)}`,
-  `Changed: ${formatFlag(playlistState.hasChange)}`,
-])
-
-function formatFlag(value) {
-  if (value === null || value === undefined || value === '') {
-    return 'unknown'
-  }
-
-  return String(value)
-}
-
 function resetSearch() {
   searchForm.songName = ''
   searchForm.singer = ''
-  searchForm.lang = DEFAULT_LANG
+  searchForm.lang = LANGUAGE_OPTIONS[0].value
   searchForm.songType = ''
   searchForm.sortType = ''
   searchState.page = 0
@@ -131,10 +118,6 @@ async function refreshPlaylist() {
   try {
     const response = await fetchPlaylist(activeBaseUrl.value)
     playlistState.number = response.number
-    playlistState.hasChange = response.hasChange
-    playlistState.statePlay = response.statePlay
-    playlistState.stateMute = response.stateMute
-    playlistState.stateMuOr = response.stateMuOr
     playlistState.songs = response.songs
   } catch (error) {
     console.error(error)
@@ -331,55 +314,55 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <form class="grid-form" @submit.prevent="submitSearch">
-          <label>
-            Song name
-            <input v-model="searchForm.songName" type="text" placeholder="Song title" />
-          </label>
-          <label>
-            Singer
-            <input v-model="searchForm.singer" type="text" placeholder="Singer name" />
-          </label>
-          <label>
-            Language
-            <input v-model="searchForm.lang" type="text" />
-          </label>
-          <label>
-            Song type
-            <input v-model="searchForm.songType" type="text" placeholder="Optional" />
-          </label>
-          <label>
-            Sort type
-            <input v-model="searchForm.sortType" type="text" placeholder="Optional" />
-          </label>
-          <div class="toolbar align-end">
-            <button data-test="search-submit" type="submit" :disabled="searchState.loading">
-              {{ searchState.loading ? 'Searching...' : 'Search' }}
-            </button>
-            <button type="button" class="button-secondary" @click="resetSearch">Reset</button>
-          </div>
-        </form>
+        <details class="filter-panel">
+          <summary class="filter-summary">Search options</summary>
+          <form class="grid-form filter-form" @submit.prevent="submitSearch">
+            <label>
+              Song name
+              <input v-model="searchForm.songName" type="text" placeholder="Song title" />
+            </label>
+            <label>
+              Singer
+              <input v-model="searchForm.singer" type="text" placeholder="Singer name" />
+            </label>
+            <label>
+              Language
+              <select v-model="searchForm.lang">
+                <option v-for="option in LANGUAGE_OPTIONS" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </label>
+            <label>
+              Song type
+              <input v-model="searchForm.songType" type="text" placeholder="Optional" />
+            </label>
+            <label>
+              Sort type
+              <input v-model="searchForm.sortType" type="text" placeholder="Optional" />
+            </label>
+            <div class="toolbar align-end">
+              <button data-test="search-submit" type="submit" :disabled="searchState.loading">
+                {{ searchState.loading ? 'Searching...' : 'Search' }}
+              </button>
+              <button type="button" class="button-secondary" @click="resetSearch">Reset</button>
+            </div>
+          </form>
+        </details>
 
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
+                <th></th>
                 <th>Song</th>
-                <th>Singer</th>
                 <th></th>
               </tr>
             </thead>
             <tbody v-if="searchState.songs.length">
               <tr v-for="song in searchState.songs" :key="song.id">
                 <td>
-                  <div class="song-title-row">
-                    <span>{{ song.name }}</span>
-                    <span v-if="song.cloud" class="cloud-marker">(☁)</span>
-                  </div>
-                </td>
-                <td>
                   <div class="singer-cell">
-                    <span>{{ song.singer }}</span>
                     <img
                       v-if="song.singerPic"
                       :src="singerImageUrl(song.singerPic)"
@@ -389,6 +372,15 @@ onBeforeUnmount(() => {
                     />
                   </div>
                 </td>
+                <td>
+                  <div class="song-meta">
+                    <div class="song-title-row">
+                      <strong>{{ song.name }}</strong>
+                      <span v-if="song.cloud" class="cloud-marker">{{ CLOUD_MARKER }}</span>
+                    </div>
+                    <div class="song-artist">{{ song.singer }}</div>
+                  </div>
+                </td>
                 <td class="action-cell">
                   <button
                     :data-test="`promote-song-${song.id}`"
@@ -396,7 +388,7 @@ onBeforeUnmount(() => {
                     class="button-secondary button-command"
                     @click="promoteSong(song.id)"
                   >
-                    TOP
+                    Prioritize
                   </button>
                   <button
                     :data-test="`add-song-${song.id}`"
@@ -404,7 +396,7 @@ onBeforeUnmount(() => {
                     class="button-secondary button-command"
                     @click="addSong(song.id)"
                   >
-                    ADD
+                    Add
                   </button>
                 </td>
               </tr>
@@ -459,10 +451,6 @@ onBeforeUnmount(() => {
               {{ playlistState.loading ? 'Refreshing...' : 'Refresh' }}
             </button>
           </div>
-        </div>
-
-        <div class="pill-row">
-          <span v-for="flag in playlistFlags" :key="flag" class="pill">{{ flag }}</span>
         </div>
 
         <ol v-if="playlistState.songs.length" class="playlist">

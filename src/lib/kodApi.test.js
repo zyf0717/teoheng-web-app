@@ -83,6 +83,7 @@ describe('kodApi', () => {
           id: '9029901',
           name: 'Lucky',
           singer: 'Tester',
+          singerPic: '',
         },
       ],
     })
