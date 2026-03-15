@@ -239,7 +239,7 @@ onBeforeUnmount(() => {
         An alternative interface for the same device endpoints used by the default KOD app.
       </p>
       <p class="field-help">
-        <strong>NOTE:</strong> This app currently does not work on iOS due to local network access issues.
+        <strong>NOTE:</strong> Use <code>http://</code> for both this app. This currently works on both Android and iOS browsers.
       </p>
     </section>
 

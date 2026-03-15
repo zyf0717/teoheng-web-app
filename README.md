@@ -41,13 +41,15 @@ The app expects a device base URL such as:
 http://device-ip:8080
 ```
 
+For best compatibility, serve and open the app over plain `http://` on the same local network as the karaoke device.
+
 In the UI, you can usually get this from the QR code shown by the karaoke system.
 
 ## Permissions
 
 - Camera access is only needed if you use the QR scanner.
-- On Android Chrome, the browser may ask for permission to access devices on the local network before the app can talk to the KTV box.
-- On iOS, browsers do not expose the same browser-level local-network permission flow for this web app, so direct access to the KTV device fails even when the same setup works on Android.
+- The app is intended for direct local-network access over plain `http://`, without a backend proxy.
+- Browser behavior can still vary across platforms, but the current app flow no longer depends on an explicit browser-level local-network permission trigger.
 
 ## How It Works
 
@@ -83,4 +85,4 @@ The currently known API behavior, discovered from the stock UI and live endpoint
 ## Notes
 
 - This app is designed for local-network use.
-- iOS browser support for direct local-network device access is more limited than Android Chrome, resulting in failure to connect to the KTV box on iOS.
+- For best compatibility, run the app from a plain `http://` origin on the same local network as the KTV box.
