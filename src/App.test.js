@@ -770,6 +770,29 @@ describe('App', () => {
     wrapper.unmount()
   })
 
+  it('renders critical control glyphs without mojibake', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+
+    expect(wrapper.get('[data-test="save-base-url"]').text()).toBe('➤')
+    expect(wrapper.get('[data-test="promote-song-9029901"]').text()).toBe('⏫')
+    expect(wrapper.get('[data-test="add-song-9029901"]').text()).toContain('➕')
+    expect(wrapper.get('[data-test="playlist-promote-song-1486462"]').text()).toBe('⏫')
+    expect(wrapper.get('[data-test="delete-song-1486462"]').text()).toBe('⛔')
+    expect(wrapper.get('[data-test="command-tone-down"]').text()).toBe('♭')
+    expect(wrapper.get('[data-test="command-tone-reset"]').text()).toBe('♮')
+    expect(wrapper.get('[data-test="command-tone-up"]').text()).toBe('♯')
+    expect(wrapper.get('[data-test="command-mute"]').text()).toBe('🔇')
+    expect(wrapper.get('[data-test="command-music-down"]').text()).toBe('🔉')
+    expect(wrapper.get('[data-test="command-music-up"]').text()).toBe('🔊')
+    expect(wrapper.get('[data-test="command-play"]').text()).toBe('⏯')
+    expect(wrapper.get('[data-test="command-skip"]').text()).toBe('⏭')
+    expect(wrapper.get('[data-test="command-toggle-mixer"]').text()).toBe('☰')
+
+    wrapper.unmount()
+  })
+
   it('lets the setup theme toggle override the system theme until reload only', async () => {
     const wrapper = mount(App)
 
