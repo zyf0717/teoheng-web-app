@@ -278,6 +278,7 @@ onBeforeUnmount(() => {
               data-test="base-url-input"
               type="url"
               :value="baseUrlInput"
+              @keydown.enter.prevent="$emit('save-base-url')"
               @input="updateBaseUrlInput"
             />
             <button data-test="save-base-url" type="button" class="button-emoji" @click="$emit('save-base-url')">➤</button>
@@ -285,7 +286,7 @@ onBeforeUnmount(() => {
         </label>
 
         <div class="theme-control">
-          <span class="field-help">Theme follows your browser by default. Toggle to override until reload:</span>
+          <span class="field-help">Toggle to override auto-theme:</span>
           <button
             data-test="theme-toggle"
             type="button"
@@ -299,7 +300,7 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="toggle-text-row">
-          <span class="field-help">Microphones controlled by KOD: </span>
+          <span class="field-help">Check if microphones controlled by KOD: </span>
           <button
             data-test="mic-controlled-toggle"
             type="button"

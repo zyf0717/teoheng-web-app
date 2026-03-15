@@ -336,14 +336,48 @@ describe('App', () => {
     wrapper.unmount()
   })
 
-  it('offers a path back to setup from empty top hits results', async () => {
+  it('does not offer setup navigation for empty top hits results', async () => {
     window.history.replaceState({}, '', '/?baseUrl=http%3A%2F%2F10.0.0.20%3A8080')
     searchSongs.mockResolvedValue(buildEmptySearchResponse())
 
     const wrapper = mount(App)
 
     await flushPromises()
+    expect(wrapper.text()).toContain('No results yet.')
+    expect(wrapper.find('[data-test="top-hits-go-setup"]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('does not offer setup navigation for empty singer results', async () => {
+    window.history.replaceState({}, '', '/?baseUrl=http%3A%2F%2F10.0.0.20%3A8080')
+    fetchSingers.mockResolvedValue(buildEmptySingerResponse())
+
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    expect(wrapper.text()).toContain('No singers returned yet.')
+    expect(wrapper.find('[data-test="singer-go-setup"]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('offers a path back to setup when top hits fails to load', async () => {
+    searchSongs.mockRejectedValue(new Error('connect ECONNREFUSED'))
+
+    const wrapper = mount(App)
+
+    await flushPromises()
     const mobilePanels = wrapper.findAll('section.mobile-panel')
+    const topHitsPanel = mobilePanels[1]
+
+    expect(wrapper.text()).toContain('Unable to load songs. Check the server URL in Setup.')
+    expect(wrapper.find('[data-test="search-form"]').exists()).toBe(false)
+    expect(topHitsPanel.find('.results-label').exists()).toBe(false)
+    expect(topHitsPanel.find('.table-wrap').exists()).toBe(false)
+    expect(topHitsPanel.find('.pagination-stack').exists()).toBe(false)
+
     await wrapper.get('[data-test="top-hits-go-setup"]').trigger('click')
 
     expect(mobilePanels[0].classes()).not.toContain('mobile-panel-hidden')
@@ -352,15 +386,22 @@ describe('App', () => {
     wrapper.unmount()
   })
 
-  it('offers a path back to setup from empty singer results', async () => {
-    window.history.replaceState({}, '', '/?baseUrl=http%3A%2F%2F10.0.0.20%3A8080')
-    fetchSingers.mockResolvedValue(buildEmptySingerResponse())
+  it('offers a path back to setup when singer search fails to load', async () => {
+    fetchSingers.mockRejectedValue(new Error('connect ECONNREFUSED'))
 
     const wrapper = mount(App)
 
     await flushPromises()
-    const mobilePanels = wrapper.findAll('section.mobile-panel')
     await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    const mobilePanels = wrapper.findAll('section.mobile-panel')
+    const singerPanel = mobilePanels[2]
+
+    expect(wrapper.text()).toContain('Unable to load singers. Check the server URL in Setup.')
+    expect(wrapper.find('[data-test="singer-search-form"]').exists()).toBe(false)
+    expect(singerPanel.find('.results-label').exists()).toBe(false)
+    expect(singerPanel.find('.singer-list').exists()).toBe(false)
+    expect(singerPanel.find('[data-test="singer-page-go"]').exists()).toBe(false)
+
     await wrapper.get('[data-test="singer-go-setup"]').trigger('click')
 
     expect(mobilePanels[0].classes()).not.toContain('mobile-panel-hidden')

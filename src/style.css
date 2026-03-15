@@ -708,6 +708,11 @@ th {
   justify-items: start;
 }
 
+.error-state {
+  align-content: start;
+  min-height: 10rem;
+}
+
 .results-label {
   color: var(--color-muted-strong);
   font-weight: 600;

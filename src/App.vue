@@ -123,6 +123,7 @@ const searchState = reactive({
   maxPage: null,
   loading: false,
   songs: [],
+  errorMessage: '',
 })
 
 const playlistState = reactive({
@@ -135,6 +136,7 @@ const singerState = reactive({
   maxPage: null,
   loading: false,
   singers: [],
+  errorMessage: '',
 })
 
 const diagnosticsState = reactive({
@@ -309,11 +311,13 @@ async function runSearch() {
     searchState.loading = false
     searchState.maxPage = null
     searchState.songs = []
+    searchState.errorMessage = ''
     setLastResponse('Search skipped: no base URL configured')
     return
   }
 
   searchState.loading = true
+  searchState.errorMessage = ''
 
   try {
     setLastRequest('SearchServlet', `page=${searchState.page} songName="${searchForm.songName.trim()}" singer="${searchForm.singer.trim()}" lang="${searchForm.lang.trim()}" songType="${searchForm.songType.trim()}" sortType="${searchForm.sortType.trim()}"`)
@@ -330,12 +334,14 @@ async function runSearch() {
     searchState.maxPage = response.maxPage
     pageInput.value = response.page + 1
     searchState.songs = response.songs
+    searchState.errorMessage = ''
     setLastResponse(`Search returned ${response.number} result(s), max page ${response.maxPage ?? 'n/a'}`)
     setLastError('')
     logDiagnosticEvent(`Search returned ${response.number} result(s)`)
   } catch (error) {
     searchState.maxPage = null
     searchState.songs = []
+    searchState.errorMessage = 'Unable to load songs. Check the server URL in Setup.'
     setLastError(error instanceof Error ? error.message : String(error))
     setLastResponse('Search failed')
     logDiagnosticEvent(`Search failed: ${diagnosticsState.lastError}`)
@@ -380,11 +386,13 @@ async function runSingerSearch() {
     singerState.loading = false
     singerState.maxPage = null
     singerState.singers = []
+    singerState.errorMessage = ''
     setLastResponse('Singer search skipped: no base URL configured')
     return
   }
 
   singerState.loading = true
+  singerState.errorMessage = ''
 
   try {
     setLastRequest('SingerServlet', `page=${singerState.page} singer="${singerForm.singer.trim()}" singerType="${singerForm.singerType}"`)
@@ -399,12 +407,14 @@ async function runSingerSearch() {
     singerState.maxPage = response.maxPage
     singerPageInput.value = response.page + 1
     singerState.singers = response.singers
+    singerState.errorMessage = ''
     setLastResponse(`Singer search returned ${response.number} result(s), max page ${response.maxPage ?? 'n/a'}`)
     setLastError('')
     logDiagnosticEvent(`Singer search returned ${response.number} result(s)`)
   } catch (error) {
     singerState.maxPage = null
     singerState.singers = []
+    singerState.errorMessage = 'Unable to load singers. Check the server URL in Setup.'
     setLastError(error instanceof Error ? error.message : String(error))
     setLastResponse('Singer search failed')
     logDiagnosticEvent(`Singer search failed: ${diagnosticsState.lastError}`)
@@ -816,6 +826,18 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
+        <div v-if="searchState.errorMessage" class="empty empty-state error-state">
+          <span>{{ searchState.errorMessage }}</span>
+          <button
+            data-test="top-hits-go-setup"
+            type="button"
+            class="button-secondary"
+            @click="goToSetup"
+          >
+            Go to Setup
+          </button>
+        </div>
+        <template v-else>
         <details class="filter-panel">
           <summary class="filter-summary">Search options</summary>
           <form data-test="search-form" class="grid-form filter-form" @submit.prevent="submitSearch">
@@ -918,15 +940,6 @@ onBeforeUnmount(() => {
                 <td colspan="2" class="empty">
                   <div class="empty-state">
                     <span>{{ searchState.loading ? 'Loading songs...' : 'No results yet.' }}</span>
-                    <button
-                      v-if="!searchState.loading"
-                      data-test="top-hits-go-setup"
-                      type="button"
-                      class="button-secondary"
-                      @click="goToSetup"
-                    >
-                      Go to Setup
-                    </button>
                   </div>
                 </td>
               </tr>
@@ -954,6 +967,7 @@ onBeforeUnmount(() => {
             </button>
           </div>
         </div>
+        </template>
         </section>
 
         <section
@@ -969,6 +983,18 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
+          <div v-if="singerState.errorMessage" class="empty empty-state error-state">
+            <span>{{ singerState.errorMessage }}</span>
+            <button
+              data-test="singer-go-setup"
+              type="button"
+              class="button-secondary"
+              @click="goToSetup"
+            >
+              Go to Setup
+            </button>
+          </div>
+          <template v-else>
           <details class="filter-panel">
             <summary class="filter-summary">Search options</summary>
             <form data-test="singer-search-form" class="grid-form filter-form" @submit.prevent="submitSingerSearch">
@@ -1028,15 +1054,6 @@ onBeforeUnmount(() => {
           </ul>
           <div v-else class="empty empty-state">
             <span>{{ singerState.loading ? 'Loading singers...' : 'No singers returned yet.' }}</span>
-            <button
-              v-if="!singerState.loading"
-              data-test="singer-go-setup"
-              type="button"
-              class="button-secondary"
-              @click="goToSetup"
-            >
-              Go to Setup
-            </button>
           </div>
 
           <div class="pagination-stack">
@@ -1065,6 +1082,7 @@ onBeforeUnmount(() => {
               </button>
             </div>
           </div>
+          </template>
         </section>
       </div>
 
