@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAGES: "true"
-      GITHUB_PAGES_BASE_PATH: /${{ github.event.repository.name }}/
+      GITHUB_PAGES_BASE_PATH: /
 
     steps:
       - name: Check out repository
@@ -46,9 +46,6 @@ jobs:
 
       - name: Build site
         run: |
-          if [ "${{ github.event.repository.name }}" = "${{ github.repository_owner }}.github.io" ]; then
-            export GITHUB_PAGES_BASE_PATH=/
-          fi
           npm run build
           touch dist/.nojekyll
 
