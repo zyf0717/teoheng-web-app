@@ -36,7 +36,6 @@ const {
   matchMedia,
   matchMediaAddEventListener,
   matchMediaRemoveEventListener,
-  requestLocalNetworkAccess,
 } = vi.hoisted(() => ({
   searchSongs: vi.fn(),
   fetchPlaylist: vi.fn(),
@@ -71,7 +70,6 @@ const {
   matchMedia: vi.fn(),
   matchMediaAddEventListener: vi.fn(),
   matchMediaRemoveEventListener: vi.fn(),
-  requestLocalNetworkAccess: vi.fn(),
 }))
 
 const TEST_BASE_URL = 'http://10.0.0.20:8080'
@@ -99,10 +97,6 @@ vi.mock('./lib/kodApi', () => ({
 
 vi.mock('./lib/browserLocation', () => ({
   reloadPage: locationReload,
-}))
-
-vi.mock('./lib/localNetworkAccess', () => ({
-  requestLocalNetworkAccess,
 }))
 
 vi.mock('jsqr', () => ({
@@ -227,7 +221,6 @@ describe('App', () => {
     matchMedia.mockReset()
     matchMediaAddEventListener.mockReset()
     matchMediaRemoveEventListener.mockReset()
-    requestLocalNetworkAccess.mockReset()
 
     Object.defineProperty(navigator, 'mediaDevices', {
       configurable: true,
@@ -248,7 +241,6 @@ describe('App', () => {
       addEventListener: matchMediaAddEventListener,
       removeEventListener: matchMediaRemoveEventListener,
     }))
-    requestLocalNetworkAccess.mockResolvedValue(true)
     getUserMedia.mockResolvedValue({
       getTracks: () => [{ stop: stopMediaTrack }],
     })
@@ -835,7 +827,6 @@ describe('App', () => {
 
     expect(window.location.search).toBe('?baseUrl=http%3A%2F%2F10.0.0.20%3A8080')
     expect(locationReload).toHaveBeenCalledTimes(1)
-    expect(requestLocalNetworkAccess).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })
@@ -850,7 +841,6 @@ describe('App', () => {
 
     expect(window.location.search).toBe('?baseUrl=http%3A%2F%2F192.168.0.8%3A8080')
     expect(locationReload).toHaveBeenCalledTimes(1)
-    expect(requestLocalNetworkAccess).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })
@@ -864,14 +854,12 @@ describe('App', () => {
 
     expect(window.location.search).toBe('?baseUrl=http%3A%2F%2F10.0.0.30%3A8080')
     expect(locationReload).toHaveBeenCalledTimes(1)
-    expect(requestLocalNetworkAccess).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })
 
-  it('saves and reloads even when the local-network access probe would fail', async () => {
+  it('saves and reloads a base URL from setup without extra permission preflight', async () => {
     window.history.replaceState({}, '', '/')
-    requestLocalNetworkAccess.mockRejectedValueOnce(new Error('Permission denied'))
 
     const wrapper = mount(App)
 
@@ -882,18 +870,15 @@ describe('App', () => {
 
     expect(locationReload).toHaveBeenCalledTimes(1)
     expect(window.location.search).toBe('?baseUrl=http%3A%2F%2F10.0.0.25%3A8080')
-    expect(wrapper.find('[data-test="connect-status"]').exists()).toBe(false)
-    expect(requestLocalNetworkAccess).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })
 
-  it('loads local API data on startup without requesting local-network access first', async () => {
+  it('loads local API data on startup', async () => {
     const wrapper = mount(App)
 
     await flushPromises()
 
-    expect(requestLocalNetworkAccess).not.toHaveBeenCalled()
     expect(searchSongs).toHaveBeenCalledWith(
       TEST_BASE_URL,
       expect.objectContaining({ page: 0 }),
@@ -907,39 +892,24 @@ describe('App', () => {
     wrapper.unmount()
   })
 
-  it('ignores local-network access probe failures on startup and keeps loading data', async () => {
-    requestLocalNetworkAccess.mockRejectedValueOnce(new Error('Permission denied'))
-
-    const wrapper = mount(App)
-
-    await flushPromises()
-
-    expect(requestLocalNetworkAccess).not.toHaveBeenCalled()
-    expect(searchSongs).toHaveBeenCalledWith(
-      TEST_BASE_URL,
-      expect.objectContaining({ page: 0 }),
-    )
-    expect(fetchPlaylist).toHaveBeenCalledWith(TEST_BASE_URL)
-    expect(fetchSingers).toHaveBeenCalledWith(
-      TEST_BASE_URL,
-      expect.objectContaining({ page: 0 }),
-    )
-    expect(wrapper.find('[data-test="connect-status"]').exists()).toBe(false)
-
-    wrapper.unmount()
-  })
-
-  it('hides the camera scanner while it is temporarily disabled', async () => {
+  it('opens the camera preview without relying on BarcodeDetector', async () => {
     window.BarcodeDetector = undefined
 
     const wrapper = mount(App)
 
     await flushPromises()
+    await wrapper.get('[data-test="toggle-qr-scanner"]').trigger('click')
+    await flushPromises()
 
-    expect(wrapper.find('[data-test="toggle-qr-scanner"]').exists()).toBe(false)
-    expect(wrapper.find('[data-test="qr-scanner-video"]').exists()).toBe(false)
-    expect(wrapper.text()).toContain('Camera scanning is temporarily disabled.')
-    expect(getUserMedia).not.toHaveBeenCalled()
+    expect(getUserMedia).toHaveBeenCalledWith({
+      audio: false,
+      video: {
+        facingMode: {
+          ideal: 'environment',
+        },
+      },
+    })
+    expect(wrapper.find('[data-test="qr-scanner-video"]').exists()).toBe(true)
 
     wrapper.unmount()
   })

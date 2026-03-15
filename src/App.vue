@@ -1,9 +1,23 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import packageJson from '../package.json'
+import PlaylistPanel from './components/PlaylistPanel.vue'
+import SingerPanel from './components/SingerPanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
+import TopHitsPanel from './components/TopHitsPanel.vue'
 import { reloadPage } from './lib/browserLocation'
 import { resolveBaseUrl } from './lib/baseUrl'
+import {
+  BASE_URL_QUERY_PARAM,
+  CLOUD_MARKER,
+  DIAGNOSTIC_EVENT_LIMIT,
+  LANGUAGE_OPTIONS,
+  MIC_CONTROL_STORAGE_KEY,
+  POLL_INTERVAL_MS,
+  SINGER_COUNTRY_OPTIONS,
+  SONG_TYPE_OPTIONS,
+  SUPPORT_EMAIL,
+} from './lib/appOptions'
 import {
   deleteSong,
   fetchPlaylist,
@@ -25,71 +39,6 @@ import {
   toggleVocals,
 } from './lib/kodApi'
 
-const POLL_INTERVAL_MS = 5000
-const DIAGNOSTIC_EVENT_LIMIT = 25
-const SUPPORT_EMAIL = 'zyf0717@gmail.com'
-const BASE_URL_QUERY_PARAM = 'baseUrl'
-const MIC_CONTROL_STORAGE_KEY = 'open-kod-mic-controlled'
-const LOCAL_NETWORK_PERMISSION_PROMPTS_DISABLED = true
-const CLOUD_MARKER = '\u2601'
-const LANGUAGE_OPTIONS = [
-  { label: 'All', value: '' },
-  { label: 'Mandarin', value: '\u56fd\u8bed' },
-  { label: 'Cantonese', value: '\u7ca4\u8bed' },
-  { label: 'Hokkien', value: '\u95fd\u8bed' },
-  { label: 'English', value: '\u82f1\u8bed' },
-  { label: 'Japanese', value: '\u65e5\u8bed' },
-  { label: 'Korean', value: '\u97e9\u8bed' },
-  { label: 'Thai', value: '\u6cf0\u8bed' },
-  { label: 'Vietnamese', value: '\u8d8a\u5357\u8bed' },
-  { label: 'Khmer', value: '\u67ec\u57d4\u5be8\u8bed' },
-  { label: 'Burmese', value: '\u7f05\u7538\u8bed' },
-  { label: 'Lao', value: '\u8001\u631d\u8bed' },
-  { label: 'Hindi', value: '\u5370\u5ea6\u8bed' },
-  { label: 'Malay', value: '\u5deb\u8bed' },
-  { label: 'Indonesian', value: '\u5370\u5c3c\u8bed' },
-  { label: 'Filipino', value: '\u83f2\u5f8b\u5bbe\u8bed' },
-  { label: 'Russian', value: '\u4fc4\u8bed' },
-  { label: 'French', value: '\u6cd5\u8bed' },
-  { label: 'Other', value: '\u5176\u4ed6' },
-]
-const SONG_TYPE_OPTIONS = [
-  { label: 'All', value: '' },
-  { label: 'Birthday', value: '\u751f\u65e5' },
-  { label: 'Celebration', value: '\u559c\u5e86' },
-  { label: "Children's", value: '\u513f\u6b4c' },
-  { label: 'Duet', value: '\u5bf9\u5531' },
-  { label: 'Folk', value: '\u6c11\u6b4c' },
-  { label: 'Medley', value: '\u4e32\u70e7' },
-  { label: 'Nostalgia', value: '\u6000\u65e7' },
-  { label: 'Opera', value: '\u620f\u66f2' },
-  { label: 'Romanised', value: '\u5b57\u5e55' },
-]
-const SORT_TYPE_OPTIONS = [
-  { label: 'Top Hits', value: '' },
-  { label: 'New Songs', value: 'TopByNewSong' },
-]
-const SINGER_COUNTRY_OPTIONS = [
-  { label: 'All', value: '\u5168\u90e8' },
-  { label: 'China', value: '\u5927\u9646' },
-  { label: 'Hong Kong / Taiwan', value: '\u6e2f\u53f0' },
-  { label: 'English', value: '\u82f1\u8bed' },
-  { label: 'Japan', value: '\u65e5\u672c' },
-  { label: 'Korea', value: '\u97e9\u56fd' },
-  { label: 'Vietnam', value: '\u8d8a\u5357' },
-  { label: 'Cambodia', value: '\u67ec\u57d4\u5be8' },
-  { label: 'India', value: '\u5370\u5ea6' },
-  { label: 'Thailand', value: '\u6cf0\u56fd' },
-  { label: 'Philippines', value: '\u83f2\u5f8b\u5bbe' },
-  { label: 'Malaysia', value: '\u9a6c\u6765\u897f\u4e9a' },
-  { label: 'Myanmar', value: '\u7f05\u7538' },
-  { label: 'Indonesia', value: '\u5370\u5c3c' },
-  { label: 'Laos', value: '\u8001\u631d' },
-  { label: 'Russia', value: '\u4fc4\u7f57\u65af' },
-  { label: 'France', value: '\u6cd5\u56fd' },
-  { label: 'Other', value: '\u5176\u4ed6' },
-]
-
 const initialBaseUrl = getBaseUrlFromQuery()
 const initialPrimaryTab = initialBaseUrl ? 'topHits' : 'settings'
 const activeBaseUrl = ref(initialBaseUrl)
@@ -105,8 +54,6 @@ const themeOverride = ref(null)
 const isDarkMode = computed(() => themeOverride.value ?? systemPrefersDarkMode.value)
 const micControlledByKod = ref(window.localStorage.getItem(MIC_CONTROL_STORAGE_KEY) === 'true')
 const showMixerControls = ref(false)
-const connectStatus = ref('')
-const connectPending = ref(false)
 
 const searchForm = reactive({
   songName: '',
@@ -206,52 +153,6 @@ function syncBaseUrlQuery(value) {
 
 function reloadIntoPrimaryTab() {
   reloadPage()
-}
-
-function clearConnectStatus() {
-  connectStatus.value = ''
-}
-
-function getLocalNetworkAccessMessage() {
-  const siteLabel = window.location.hostname || window.location.origin
-  return `Allow ${siteLabel} to access devices on your local network, then try connecting again.`
-}
-
-async function verifyLocalNetworkAccess(baseUrl, options = {}) {
-  if (LOCAL_NETWORK_PERMISSION_PROMPTS_DISABLED) {
-    return true
-  }
-
-  const { showErrorInConnectPanel = true, switchToSetupOnFailure = false } = options
-
-  connectPending.value = true
-
-  if (showErrorInConnectPanel) {
-    clearConnectStatus()
-  }
-
-  try {
-    await requestLocalNetworkAccess(baseUrl)
-    return true
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-
-    if (showErrorInConnectPanel) {
-      connectStatus.value = getLocalNetworkAccessMessage()
-    }
-
-    if (switchToSetupOnFailure) {
-      activeMobileTab.value = 'settings'
-      activeBrowseTab.value = 'settings'
-    }
-
-    setLastError(message)
-    setLastResponse('Local network access check failed')
-    logDiagnosticEvent(`Local network access check failed for ${baseUrl}: ${message}`)
-    return false
-  } finally {
-    connectPending.value = false
-  }
 }
 
 function logDiagnosticEvent(message) {
@@ -369,7 +270,10 @@ async function runSearch() {
   searchState.errorMessage = ''
 
   try {
-    setLastRequest('SearchServlet', `page=${searchState.page} songName="${searchForm.songName.trim()}" singer="${searchForm.singer.trim()}" lang="${searchForm.lang.trim()}" songType="${searchForm.songType.trim()}" sortType="${searchForm.sortType.trim()}"`)
+    setLastRequest(
+      'SearchServlet',
+      `page=${searchState.page} songName="${searchForm.songName.trim()}" singer="${searchForm.singer.trim()}" lang="${searchForm.lang.trim()}" songType="${searchForm.songType.trim()}" sortType="${searchForm.sortType.trim()}"`,
+    )
     const response = await searchSongs(activeBaseUrl.value, {
       songName: searchForm.songName.trim(),
       singer: searchForm.singer.trim(),
@@ -671,20 +575,12 @@ async function saveResolvedBaseUrl(nextBaseUrl = baseUrlInput.value) {
 
   if (!resolvedBaseUrl) {
     activeBaseUrl.value = ''
-    clearConnectStatus()
     syncBaseUrlQuery('')
     logDiagnosticEvent(trimmedBaseUrl ? `Base URL saved: ${resolvedBaseUrl}` : 'Base URL cleared')
     reloadIntoPrimaryTab()
     return
   }
 
-  const hasLocalNetworkAccess = await verifyLocalNetworkAccess(resolvedBaseUrl)
-
-  if (!hasLocalNetworkAccess) {
-    return
-  }
-
-  clearConnectStatus()
   activeBaseUrl.value = resolvedBaseUrl
   syncBaseUrlQuery(resolvedBaseUrl)
   logDiagnosticEvent(`Base URL saved: ${resolvedBaseUrl}`)
@@ -699,24 +595,7 @@ async function handleScannedBaseUrl(scannedBaseUrl) {
   await saveResolvedBaseUrl(scannedBaseUrl)
 }
 
-async function initializeDeviceAccess() {
-  if (!hasConfiguredBaseUrl()) {
-    syncPolling()
-    runSearch()
-    runSingerSearch()
-    refreshPlaylist()
-    return
-  }
-
-  const hasLocalNetworkAccess = await verifyLocalNetworkAccess(activeBaseUrl.value, {
-    showErrorInConnectPanel: true,
-    switchToSetupOnFailure: true,
-  })
-
-  if (!hasLocalNetworkAccess) {
-    return
-  }
-
+function initializeDeviceAccess() {
   syncPolling()
   runSearch()
   runSingerSearch()
@@ -771,7 +650,7 @@ onMounted(() => {
   }
 
   logDiagnosticEvent('Session started')
-  void initializeDeviceAccess()
+  initializeDeviceAccess()
   updateCommandBarOffset()
 
   if (typeof ResizeObserver !== 'undefined' && commandBarRef.value) {
@@ -888,8 +767,6 @@ onBeforeUnmount(() => {
         >
           <SettingsPanel
             :base-url-input="baseUrlInput"
-            :connect-pending="connectPending"
-            :connect-status="connectStatus"
             :is-dark-mode="isDarkMode"
             :mic-controlled-by-kod="micControlledByKod"
             :report-status="diagnosticsState.reportStatus"
@@ -904,321 +781,55 @@ onBeforeUnmount(() => {
           />
         </section>
 
-        <section
-          class="panel stack mobile-panel"
-          :class="{
-            'mobile-panel-hidden': activeMobileTab !== 'topHits',
-            'desktop-panel-hidden': activeBrowseTab !== 'topHits',
-          }"
-        >
-        <div class="section-heading panel-heading">
-          <div>
-            <h2>Top Hits</h2>
-          </div>
-        </div>
+        <TopHitsPanel
+          :active-mobile-tab="activeMobileTab"
+          :active-browse-tab="activeBrowseTab"
+          :search-state="searchState"
+          :search-form="searchForm"
+          :language-options="LANGUAGE_OPTIONS"
+          :song-type-options="SONG_TYPE_OPTIONS"
+          :cloud-marker="CLOUD_MARKER"
+          :display-page="displayPage"
+          :page-input="pageInput"
+          :singer-image-url="singerImageUrl"
+          @go-to-setup="goToSetup"
+          @submit-search="submitSearch"
+          @reset-search="resetSearch"
+          @promote-song="promoteSong"
+          @add-song="addSong"
+          @update:page-input="pageInput = $event"
+          @go-to-previous-page="goToPreviousPage"
+          @go-to-next-page="goToNextPage"
+          @go-to-page="goToPage"
+        />
 
-        <div v-if="searchState.errorMessage" class="empty empty-state error-state">
-          <span>{{ searchState.errorMessage }}</span>
-          <button
-            data-test="top-hits-go-setup"
-            type="button"
-            class="button-secondary"
-            @click="goToSetup"
-          >
-            Go to Setup
-          </button>
-        </div>
-        <template v-else>
-        <details class="filter-panel">
-          <summary class="filter-summary">Search options</summary>
-          <form data-test="search-form" class="grid-form filter-form" @submit.prevent="submitSearch">
-            <label>
-              Song title
-              <input v-model="searchForm.songName" data-test="search-song-name" type="text" placeholder="Insert title" />
-            </label>
-            <label>
-              Singer
-              <input v-model="searchForm.singer" data-test="search-singer" type="text" placeholder="Insert name" />
-            </label>
-            <label>
-              Language
-              <select v-model="searchForm.lang" data-test="search-language">
-                <option v-for="option in LANGUAGE_OPTIONS" :key="option.value" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </label>
-            <label>
-              Song type
-              <select v-model="searchForm.songType" data-test="search-song-type">
-                <option v-for="option in SONG_TYPE_OPTIONS" :key="option.value || 'all-song-type'" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </label>
-            <!--
-            <label>
-              Sort type
-              <select v-model="searchForm.sortType" data-test="search-sort-type">
-                <option v-for="option in SORT_TYPE_OPTIONS" :key="option.value || 'default-sort-type'" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </label>
-            -->
-            <div class="filter-actions">
-              <button data-test="search-submit" type="submit" :disabled="searchState.loading">
-                Search
-              </button>
-              <button
-                data-test="search-reset"
-                type="button"
-                class="button-secondary"
-                :disabled="searchState.loading"
-                @click="resetSearch"
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </details>
-
-        <p class="results-label">Search results:</p>
-
-        <div class="table-wrap">
-          <table>
-            <tbody v-if="searchState.songs.length">
-              <tr v-for="song in searchState.songs" :key="song.id">
-                <td class="top-hit-main-cell">
-                  <div class="top-hit-row-content">
-                    <img
-                      v-if="song.singerPic"
-                      :src="singerImageUrl(song.singerPic)"
-                      :alt="`${song.singer} portrait`"
-                      class="singer-icon"
-                      loading="lazy"
-                    />
-                    <div class="song-meta">
-                      <div class="song-title-row">
-                        <strong>{{ song.name }}</strong>
-                      </div>
-                      <div class="song-artist">{{ song.singer }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="action-cell">
-                  <button
-                    :data-test="`promote-song-${song.id}`"
-                    type="button"
-                    class="button-secondary button-command button-emoji"
-                    @click="promoteSong(song.id)"
-                  >
-                    ⏫
-                  </button>
-                  <button
-                    :data-test="`add-song-${song.id}`"
-                    type="button"
-                    class="button-secondary button-command"
-                    @click="addSong(song.id)"
-                  >
-                    ➕<span v-if="song.cloud" class="button-cloud"> ({{ CLOUD_MARKER }})</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-            <tbody v-else>
-              <tr>
-                <td colspan="2" class="empty">
-                  <div class="empty-state">
-                    <span>{{ searchState.loading ? 'Loading songs...' : 'No results yet.' }}</span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="pagination-stack">
-          <div class="pagination-bar">
-            <button type="button" class="page-arrow page-arrow-prev" @click="goToPreviousPage" :disabled="searchState.page === 0 || searchState.loading">
-              ◀
-            </button>
-            <span>Page {{ displayPage }}<template v-if="searchState.maxPage">/{{ searchState.maxPage }}</template></span>
-            <button type="button" class="page-arrow page-arrow-next" @click="goToNextPage" :disabled="searchState.loading">
-              ▶
-            </button>
-          </div>
-          <div class="page-jump-row">
-            <label class="page-jump">
-              <span>Page:</span>
-              <input v-model.number="pageInput" type="text" inputmode="numeric" pattern="[0-9]*" />
-            </label>
-            <button type="button" @click="goToPage" :disabled="searchState.loading">
-              Go
-            </button>
-          </div>
-        </div>
-        </template>
-        </section>
-
-        <section
-          class="panel stack mobile-panel"
-          :class="{
-            'mobile-panel-hidden': activeMobileTab !== 'singer',
-            'desktop-panel-hidden': activeBrowseTab !== 'singer',
-          }"
-        >
-          <div class="section-heading panel-heading">
-            <div>
-              <h2>Singer</h2>
-            </div>
-          </div>
-
-          <div v-if="singerState.errorMessage" class="empty empty-state error-state">
-            <span>{{ singerState.errorMessage }}</span>
-            <button
-              data-test="singer-go-setup"
-              type="button"
-              class="button-secondary"
-              @click="goToSetup"
-            >
-              Go to Setup
-            </button>
-          </div>
-          <template v-else>
-          <details class="filter-panel">
-            <summary class="filter-summary">Search options</summary>
-            <form data-test="singer-search-form" class="grid-form filter-form" @submit.prevent="submitSingerSearch">
-              <label>
-                Singer
-                <input v-model="singerForm.singer" data-test="singer-search-name" type="text" placeholder="Insert name" />
-              </label>
-              <label>
-                Country
-                <select v-model="singerForm.singerType" data-test="singer-search-country">
-                  <option v-for="option in SINGER_COUNTRY_OPTIONS" :key="option.value" :value="option.value">
-                    {{ option.label }}
-                  </option>
-                </select>
-              </label>
-              <div class="filter-actions">
-                <button data-test="singer-search-submit" type="submit" :disabled="singerState.loading">
-                  Search
-                </button>
-                <button
-                  data-test="singer-search-reset"
-                  type="button"
-                  class="button-secondary"
-                  :disabled="singerState.loading"
-                  @click="resetSingerSearch"
-                >
-                  Reset
-                </button>
-              </div>
-            </form>
-          </details>
-
-          <p class="results-label">Search results:</p>
-
-          <ul v-if="singerState.singers.length" class="singer-list">
-            <li v-for="singer in singerState.singers" :key="`${singer.name}-${singer.picture}`" class="singer-list-item">
-              <button
-                :data-test="`singer-result-${singer.name}`"
-                type="button"
-                class="singer-row singer-result-button"
-                @click="searchTopHitsBySinger(singer.name)"
-              >
-                <img
-                  v-if="singer.picture"
-                  :src="singerImageUrl(singer.picture)"
-                  :alt="`${singer.name} portrait`"
-                  class="singer-icon"
-                  loading="lazy"
-                />
-                <div class="song-meta">
-                  <div class="song-title-row">
-                    <strong>{{ singer.name }}</strong>
-                  </div>
-                </div>
-              </button>
-            </li>
-          </ul>
-          <div v-else class="empty empty-state">
-            <span>{{ singerState.loading ? 'Loading singers...' : 'No singers returned yet.' }}</span>
-          </div>
-
-          <div class="pagination-stack">
-            <div class="pagination-bar">
-              <button
-                data-test="singer-page-prev"
-                type="button"
-                class="page-arrow page-arrow-prev"
-                @click="goToPreviousSingerPage"
-                :disabled="singerState.page === 0 || singerState.loading"
-              >
-                ◀
-              </button>
-              <span>Page {{ singerDisplayPage }}<template v-if="singerState.maxPage">/{{ singerState.maxPage }}</template></span>
-              <button data-test="singer-page-next" type="button" class="page-arrow page-arrow-next" @click="goToNextSingerPage" :disabled="singerState.loading">
-                ▶
-              </button>
-            </div>
-            <div class="page-jump-row">
-              <label class="page-jump">
-                <span>Page:</span>
-                <input v-model.number="singerPageInput" data-test="singer-page-input" type="text" inputmode="numeric" pattern="[0-9]*" />
-              </label>
-              <button type="button" data-test="singer-page-go" @click="goToSingerPage" :disabled="singerState.loading">
-                Go
-              </button>
-            </div>
-          </div>
-          </template>
-        </section>
+        <SingerPanel
+          :active-mobile-tab="activeMobileTab"
+          :active-browse-tab="activeBrowseTab"
+          :singer-state="singerState"
+          :singer-form="singerForm"
+          :singer-country-options="SINGER_COUNTRY_OPTIONS"
+          :singer-display-page="singerDisplayPage"
+          :singer-page-input="singerPageInput"
+          :singer-image-url="singerImageUrl"
+          @go-to-setup="goToSetup"
+          @submit-search="submitSingerSearch"
+          @reset-search="resetSingerSearch"
+          @search-top-hits-by-singer="searchTopHitsBySinger"
+          @update:singer-page-input="singerPageInput = $event"
+          @go-to-previous-page="goToPreviousSingerPage"
+          @go-to-next-page="goToNextSingerPage"
+          @go-to-page="goToSingerPage"
+        />
       </div>
 
-      <section class="panel stack mobile-panel" :class="{ 'mobile-panel-hidden': activeMobileTab !== 'playlist' }">
-        <div class="section-heading panel-heading">
-          <div>
-            <h2>Playlist</h2>
-            <p class="field-help playlist-subtitle">
-              <em>Refreshes automatically every {{ POLL_INTERVAL_MS / 1000 }} seconds.</em>
-            </p>
-          </div>
-        </div>
-
-        <ol v-if="playlistState.songs.length" class="playlist">
-          <li v-for="song in playlistState.songs" :key="`${song.id}-${song.name}`">
-            <div class="playlist-row">
-              <div class="song-meta">
-                <div class="song-title-row">
-                  <strong>{{ song.name }}</strong>
-                </div>
-                <div class="song-artist">{{ song.singer }}</div>
-              </div>
-              <div class="action-cell">
-                <button
-                  :data-test="`playlist-promote-song-${song.id}`"
-                  type="button"
-                  class="button-secondary button-command button-emoji"
-                  @click="promoteSong(song.id)"
-                >
-                  ⏫
-                </button>
-                <button
-                  :data-test="`delete-song-${song.id}`"
-                  type="button"
-                  class="button-secondary button-danger button-emoji"
-                  @click="removeSong(song.id)"
-                >
-                  ⛔
-                </button>
-              </div>
-            </div>
-          </li>
-        </ol>
-        <p v-else class="empty">Playlist is empty.</p>
-      </section>
+      <PlaylistPanel
+        :active-mobile-tab="activeMobileTab"
+        :playlist-state="playlistState"
+        :poll-interval-ms="POLL_INTERVAL_MS"
+        @promote-song="promoteSong"
+        @remove-song="removeSong"
+      />
     </div>
   </main>
 

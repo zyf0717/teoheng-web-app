@@ -18,7 +18,6 @@ const SUPPORT_EMAIL_BODY = encodeURIComponent(
 
 const DISCLAIMER_TEXT =
   'Disclaimer: through this app, your device is communicating directly with the karaoke device over a local network, and does not communicate with any external server.'
-const CAMERA_SCANNER_DISABLED = true
 
 defineProps({
   baseUrlInput: {
@@ -36,14 +35,6 @@ defineProps({
   reportStatus: {
     type: String,
     default: '',
-  },
-  connectStatus: {
-    type: String,
-    default: '',
-  },
-  connectPending: {
-    type: Boolean,
-    default: false,
   },
   supportEmail: {
     type: String,
@@ -85,10 +76,6 @@ function supportEmailHref(address) {
 }
 
 function canUseCameraScanner() {
-  if (CAMERA_SCANNER_DISABLED) {
-    return false
-  }
-
   return Boolean(
     typeof window !== 'undefined' &&
       typeof navigator !== 'undefined' &&
@@ -118,11 +105,6 @@ async function toggleScanner() {
 }
 
 async function startScanner() {
-  if (CAMERA_SCANNER_DISABLED) {
-    scannerStatus.value = 'Camera scanning is temporarily disabled.'
-    return
-  }
-
   if (!canUseCameraScanner()) {
     scannerStatus.value = 'Camera scanning needs a browser with camera access and QR detection support.'
     return
@@ -280,20 +262,15 @@ onBeforeUnmount(() => {
         <div class="stack">
           <span class="field-help">Scan the QR code on the KTV display:</span>
           <div class="scanner-block">
-            <p v-if="CAMERA_SCANNER_DISABLED" class="field-help scanner-status">
-              Camera scanning is temporarily disabled.
-            </p>
-            <template v-else>
-              <div class="settings-support-actions">
-                <button data-test="toggle-qr-scanner" type="button" class="button-secondary" @click="toggleScanner">
-                  {{ scannerOpen ? 'Stop camera scanner' : 'Scan QR with camera' }}
-                </button>
-              </div>
-              <div v-if="scannerOpen" class="scanner-preview">
-                <video ref="scannerVideoRef" data-test="qr-scanner-video" autoplay muted playsinline />
-              </div>
-              <p v-if="scannerStatus" class="field-help scanner-status">{{ scannerStatus }}</p>
-            </template>
+            <div class="settings-support-actions">
+              <button data-test="toggle-qr-scanner" type="button" class="button-secondary" @click="toggleScanner">
+                {{ scannerOpen ? 'Stop camera scanner' : 'Scan QR with camera' }}
+              </button>
+            </div>
+            <div v-if="scannerOpen" class="scanner-preview">
+              <video ref="scannerVideoRef" data-test="qr-scanner-video" autoplay muted playsinline />
+            </div>
+            <p v-if="scannerStatus" class="field-help scanner-status">{{ scannerStatus }}</p>
           </div>
         </div>
 
@@ -310,7 +287,6 @@ onBeforeUnmount(() => {
             <button data-test="save-base-url" type="button" class="button-emoji" @click="$emit('save-base-url')">➤</button>
           </div>
         </label>
-        <p v-if="connectStatus" data-test="connect-status" class="field-help settings-status">{{ connectStatus }}</p>
 
         <div class="theme-control">
           <span class="field-help">Toggle to override auto-theme:</span>
