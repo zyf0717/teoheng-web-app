@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import packageJson from '../package.json'
 import CommandBar from './components/CommandBar.vue'
+import FavoritesPanel from './components/FavoritesPanel.vue'
 import PlaylistPanel from './components/PlaylistPanel.vue'
 import SingerPanel from './components/SingerPanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
@@ -265,10 +266,6 @@ function searchTopHitsBySinger(singerName) {
 
 function setMobileTab(tab) {
   activeMobileTab.value = tab
-
-  if (tab === 'topHits' || tab === 'singer') {
-    activeBrowseTab.value = tab
-  }
 }
 
 function setBrowseTab(tab) {
@@ -424,6 +421,7 @@ function saveMicControlPreference() {
 }
 
 const {
+  favoriteSongs,
   isFavoriteSong,
   syncFavoriteSongIds,
   toggleFavoriteSong: addFavoriteSong,
@@ -486,15 +484,17 @@ onBeforeUnmount(() => {
   <main class="app-shell">
     <div class="mobile-tabs section-gap" role="tablist" aria-label="Main panels">
       <button
+        data-test="mobile-tab-settings"
         type="button"
         class="mobile-tab"
         :class="{ 'mobile-tab-active': activeMobileTab === 'settings' }"
         :aria-selected="activeMobileTab === 'settings'"
-        @click="setMobileTab('settings')"
+        @click="setBrowseTab('settings')"
       >
         Setup
       </button>
       <button
+        data-test="mobile-tab-top-hits"
         type="button"
         class="mobile-tab"
         :class="{ 'mobile-tab-active': activeMobileTab === 'topHits' }"
@@ -504,6 +504,7 @@ onBeforeUnmount(() => {
         Top Hits
       </button>
       <button
+        data-test="mobile-tab-singer"
         type="button"
         class="mobile-tab"
         :class="{ 'mobile-tab-active': activeMobileTab === 'singer' }"
@@ -513,6 +514,7 @@ onBeforeUnmount(() => {
         Singer
       </button>
       <button
+        data-test="mobile-tab-playlist"
         type="button"
         class="mobile-tab"
         :class="{ 'mobile-tab-active': activeMobileTab === 'playlist' }"
@@ -520,6 +522,16 @@ onBeforeUnmount(() => {
         @click="setMobileTab('playlist')"
       >
         Playlist
+      </button>
+      <button
+        data-test="mobile-tab-favorites"
+        type="button"
+        class="mobile-tab"
+        :class="{ 'mobile-tab-active': activeMobileTab === 'favorites' }"
+        :aria-selected="activeMobileTab === 'favorites'"
+        @click="setBrowseTab('favorites')"
+      >
+        Favourites
       </button>
     </div>
 
@@ -553,6 +565,16 @@ onBeforeUnmount(() => {
         @click="setBrowseTab('singer')"
       >
         Singer
+      </button>
+      <button
+        data-test="desktop-tab-favorites"
+        type="button"
+        class="mobile-tab"
+        :class="{ 'mobile-tab-active': activeBrowseTab === 'favorites' }"
+        :aria-selected="activeBrowseTab === 'favorites'"
+        @click="setBrowseTab('favorites')"
+      >
+        Favourites
       </button>
     </div>
 
@@ -625,6 +647,19 @@ onBeforeUnmount(() => {
           @go-to-previous-page="goToPreviousSingerPage"
           @go-to-next-page="goToNextSingerPage"
           @go-to-page="goToSingerPage"
+        />
+
+        <FavoritesPanel
+          :active-mobile-tab="activeMobileTab"
+          :active-browse-tab="activeBrowseTab"
+          :favorite-songs="favoriteSongs"
+          :cloud-marker="CLOUD_MARKER"
+          :singer-image-url="singerImageUrl"
+          :is-song-queued="isSongQueued"
+          :is-song-pending="isSongPending"
+          @promote-song="promoteSong"
+          @add-song="addSong"
+          @favorite-song="addFavoriteSong"
         />
       </div>
 

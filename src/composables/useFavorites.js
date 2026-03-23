@@ -2,6 +2,7 @@ import { ref } from 'vue'
 
 export function useFavorites({ storageKey, logEvent }) {
   const favoriteSongIds = ref(new Set())
+  const favoriteSongs = ref([])
 
   function readFavorites() {
     const saved = window.localStorage.getItem(storageKey)
@@ -19,10 +20,12 @@ export function useFavorites({ storageKey, logEvent }) {
   }
 
   function syncFavoriteSongIds() {
-    const nextIds = readFavorites()
+    const nextFavorites = readFavorites()
+    const nextIds = nextFavorites
       .map((song) => (song?.id ? String(song.id) : ''))
       .filter(Boolean)
 
+    favoriteSongs.value = nextFavorites
     favoriteSongIds.value = new Set(nextIds)
   }
 
@@ -64,6 +67,7 @@ export function useFavorites({ storageKey, logEvent }) {
   }
 
   return {
+    favoriteSongs,
     isFavoriteSong,
     syncFavoriteSongIds,
     toggleFavoriteSong,

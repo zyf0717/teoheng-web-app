@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from 'vue'
+
 defineProps({
   activeMobileTab: {
     type: String,
@@ -45,6 +47,24 @@ const emit = defineEmits([
   'go-to-page',
 ])
 
+const filterPanelRef = ref(null)
+
+function collapseFilterPanel() {
+  if (filterPanelRef.value) {
+    filterPanelRef.value.open = false
+  }
+}
+
+function submitSearch() {
+  emit('submit-search')
+  collapseFilterPanel()
+}
+
+function resetSearch() {
+  emit('reset-search')
+  collapseFilterPanel()
+}
+
 function updateSingerPageInput(event) {
   const nextValue = event.target.value
   emit('update:singer-page-input', nextValue === '' ? '' : Number(nextValue))
@@ -72,9 +92,9 @@ function updateSingerPageInput(event) {
       </button>
     </div>
     <template v-else>
-      <details class="filter-panel">
+      <details ref="filterPanelRef" class="filter-panel">
         <summary class="filter-summary">Search options</summary>
-        <form data-test="singer-search-form" class="grid-form filter-form" @submit.prevent="emit('submit-search')">
+        <form data-test="singer-search-form" class="grid-form filter-form" @submit.prevent="submitSearch">
           <label>
             Singer
             <input v-model="singerForm.singer" data-test="singer-search-name" type="text" placeholder="Insert name" />
@@ -96,7 +116,7 @@ function updateSingerPageInput(event) {
               type="button"
               class="button-secondary"
               :disabled="singerState.loading"
-              @click="emit('reset-search')"
+              @click="resetSearch"
             >
               Reset
             </button>
@@ -105,6 +125,43 @@ function updateSingerPageInput(event) {
       </details>
 
       <p class="results-label">Search results:</p>
+
+      <div class="pagination-stack">
+        <div class="pagination-bar">
+          <button
+            type="button"
+            class="page-arrow page-arrow-prev"
+            :disabled="singerState.page === 0 || singerState.loading"
+            @click="emit('go-to-previous-page')"
+          >
+            ◀
+          </button>
+          <span>Page {{ singerDisplayPage }}<template v-if="singerState.maxPage">/{{ singerState.maxPage }}</template></span>
+          <button
+            type="button"
+            class="page-arrow page-arrow-next"
+            :disabled="singerState.loading"
+            @click="emit('go-to-next-page')"
+          >
+            ▶
+          </button>
+        </div>
+        <div class="page-jump-row">
+          <label class="page-jump">
+            <span>Page:</span>
+            <input
+              :value="singerPageInput"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              @input="updateSingerPageInput"
+            />
+          </label>
+          <button type="button" :disabled="singerState.loading" @click="emit('go-to-page')">
+            Go
+          </button>
+        </div>
+      </div>
 
       <ul v-if="singerState.singers.length" class="singer-list">
         <li v-for="singer in singerState.singers" :key="`${singer.name}-${singer.picture}`" class="singer-list-item">

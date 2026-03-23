@@ -200,7 +200,7 @@ describe('App', () => {
 
     await flushPromises()
     const mobilePanels = wrapper.findAll('section.mobile-panel')
-    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
 
     expect(wrapper.text()).toContain('Singer')
     expect(mobilePanels[2].classes()).not.toContain('mobile-panel-hidden')
@@ -229,7 +229,7 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
     expect(wrapper.text()).toContain('No singers returned yet.')
     expect(wrapper.find('[data-test="singer-go-setup"]').exists()).toBe(false)
 
@@ -265,7 +265,7 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
     const mobilePanels = wrapper.findAll('section.mobile-panel')
     const singerPanel = mobilePanels[2]
 
@@ -339,7 +339,7 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
     await wrapper.get('[data-test="singer-page-input"]').setValue(2)
     await wrapper.get('[data-test="singer-page-go"]').trigger('click')
     await flushPromises()
@@ -357,7 +357,8 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
+    wrapper.findAll('details.filter-panel')[1].element.open = true
     await wrapper.get('[data-test="singer-search-name"]').setValue('\u5468')
     await wrapper.get('[data-test="singer-search-country"]').setValue('\u5927\u9646')
     await wrapper.get('[data-test="singer-search-form"]').trigger('submit')
@@ -371,6 +372,7 @@ describe('App', () => {
         page: 0,
       }),
     )
+    expect(wrapper.findAll('details.filter-panel')[1].element.open).toBe(false)
 
     wrapper.unmount()
   })
@@ -398,7 +400,7 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
     await wrapper.get('[data-test="singer-page-next"]').trigger('click')
     await flushPromises()
 
@@ -416,7 +418,7 @@ describe('App', () => {
 
     await flushPromises()
     const mobilePanels = wrapper.findAll('section.mobile-panel')
-    await wrapper.findAll('button.mobile-tab')[2].trigger('click')
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
     await wrapper.get('[data-test="singer-result-\u5468\u6770\u4f26"]').trigger('click')
     await flushPromises()
 
@@ -438,6 +440,33 @@ describe('App', () => {
     wrapper.unmount()
   })
 
+  it('renders saved favourites in the favourites tab', async () => {
+    window.localStorage.setItem(
+      FAVORITES_STORAGE_KEY,
+      JSON.stringify([
+        {
+          id: '9029901',
+          name: 'Lucky',
+          singer: 'Tester',
+          singerPic: '26940.jpg',
+          cloud: false,
+        },
+      ]),
+    )
+
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.get('[data-test="mobile-tab-favorites"]').trigger('click')
+
+    const mobilePanels = wrapper.findAll('section.mobile-panel')
+    expect(mobilePanels[3].classes()).not.toContain('mobile-panel-hidden')
+    expect(wrapper.text()).toContain('Favourites')
+    expect(wrapper.text()).toContain('Lucky')
+
+    wrapper.unmount()
+  })
+
   it('queues a song from the search results and refreshes the playlist', async () => {
     const wrapper = mount(App)
 
@@ -455,7 +484,7 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    await wrapper.get('summary.filter-summary').trigger('click')
+    wrapper.get('details.filter-panel').element.open = true
     await wrapper.get('[data-test="search-singer"]').setValue('Eason')
     await wrapper.get('[data-test="search-form"]').trigger('submit')
     await flushPromises()
@@ -467,6 +496,20 @@ describe('App', () => {
         page: 0,
       }),
     )
+    expect(wrapper.get('details.filter-panel').element.open).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('collapses the top hits filter panel after reset', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    wrapper.get('details.filter-panel').element.open = true
+    await wrapper.get('[data-test="search-reset"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.get('details.filter-panel').element.open).toBe(false)
 
     wrapper.unmount()
   })

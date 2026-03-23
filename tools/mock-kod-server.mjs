@@ -6,18 +6,18 @@ const PAGE_SIZE = 8
 const SINGER_PAGE_SIZE = 10
 
 const SONGS = [
-  song('100001', 'Small Lucky', 'Hebe', '26940.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 98, releaseOrder: 4 }),
-  song('100002', 'Blue and White Porcelain', 'Jay Chou', '27356.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 99, releaseOrder: 2 }),
-  song('100003', 'Ten Years', 'Eason Chan', '26554.jpg', { lang: '\u7ca4\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 97, releaseOrder: 3 }),
-  song('100004', 'Later', 'Rene Liu', '27111.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 93, releaseOrder: 6 }),
-  song('100005', 'Ordinary Road', 'Pu Shu', '26777.jpg', { lang: '\u56fd\u8bed', singerType: '\u5927\u9646', cloud: true, rank: 94, releaseOrder: 5 }),
-  song('100006', 'Love Confession', 'Jay Chou', '27356.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: true, rank: 95, releaseOrder: 1 }),
-  song('100007', 'Kiss Goodbye', 'Jacky Cheung', '27426.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 91, releaseOrder: 7 }),
-  song('100008', 'Boundless Oceans, Vast Skies', 'Beyond', '27888.jpg', { lang: '\u7ca4\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 96, releaseOrder: 8 }),
+  song('100001', '小幸运', 'Hebe', '26940.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 98, releaseOrder: 4 }),
+  song('100002', '青花瓷', 'Jay Chou', '27356.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 99, releaseOrder: 2 }),
+  song('100003', '十年', 'Eason Chan', '26554.jpg', { lang: '\u7ca4\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 97, releaseOrder: 3 }),
+  song('100004', '后来', 'Rene Liu', '27111.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 93, releaseOrder: 6 }),
+  song('100005', '平凡之路', 'Pu Shu', '26777.jpg', { lang: '\u56fd\u8bed', singerType: '\u5927\u9646', cloud: true, rank: 94, releaseOrder: 5 }),
+  song('100006', '告白气球', 'Jay Chou', '27356.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: true, rank: 95, releaseOrder: 1 }),
+  song('100007', '吻别', 'Jacky Cheung', '27426.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 91, releaseOrder: 7 }),
+  song('100008', '海阔天空', 'Beyond', '27888.jpg', { lang: '\u7ca4\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 96, releaseOrder: 8 }),
   song('100009', 'Lemon', 'Kenshi Yonezu', '28100.jpg', { lang: '\u65e5\u8bed', singerType: '\u65e5\u672c', cloud: true, rank: 88, releaseOrder: 9 }),
   song('100010', 'Dynamite', 'BTS', '28200.jpg', { lang: '\u97e9\u8bed', singerType: '\u97e9\u56fd', cloud: true, rank: 87, releaseOrder: 10 }),
   song('100011', 'Yesterday Once More', 'Carpenters', '28300.jpg', { lang: '\u82f1\u8bed', singerType: '\u82f1\u8bed', cloud: false, rank: 84, releaseOrder: 11 }),
-  song('100012', 'Moon Represents My Heart', 'Teresa Teng', '28400.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 92, releaseOrder: 12 }),
+  song('100012', '月亮代表我的心', 'Teresa Teng', '28400.jpg', { lang: '\u56fd\u8bed', singerType: '\u6e2f\u53f0', cloud: false, rank: 92, releaseOrder: 12 }),
 ]
 
 const state = {

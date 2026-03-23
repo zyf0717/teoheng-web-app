@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from 'vue'
+
 defineProps({
   activeMobileTab: {
     type: String,
@@ -67,6 +69,24 @@ const emit = defineEmits([
   'go-to-page',
 ])
 
+const filterPanelRef = ref(null)
+
+function collapseFilterPanel() {
+  if (filterPanelRef.value) {
+    filterPanelRef.value.open = false
+  }
+}
+
+function submitSearch() {
+  emit('submit-search')
+  collapseFilterPanel()
+}
+
+function resetSearch() {
+  emit('reset-search')
+  collapseFilterPanel()
+}
+
 function updatePageInput(event) {
   const nextValue = event.target.value
   emit('update:page-input', nextValue === '' ? '' : Number(nextValue))
@@ -94,9 +114,9 @@ function updatePageInput(event) {
       </button>
     </div>
     <template v-else>
-      <details class="filter-panel">
+      <details ref="filterPanelRef" class="filter-panel">
         <summary class="filter-summary">Search options</summary>
-        <form data-test="search-form" class="grid-form filter-form" @submit.prevent="emit('submit-search')">
+        <form data-test="search-form" class="grid-form filter-form" @submit.prevent="submitSearch">
           <label>
             Song title
             <input v-model="searchForm.songName" data-test="search-song-name" type="text" placeholder="Insert title" />
@@ -130,7 +150,7 @@ function updatePageInput(event) {
               type="button"
               class="button-secondary"
               :disabled="searchState.loading"
-              @click="emit('reset-search')"
+              @click="resetSearch"
             >
               Reset
             </button>
@@ -139,6 +159,32 @@ function updatePageInput(event) {
       </details>
 
       <p class="results-label">Search results:</p>
+
+      <div class="pagination-stack">
+        <div class="pagination-bar">
+          <button
+            type="button"
+            class="page-arrow page-arrow-prev"
+            :disabled="searchState.page === 0 || searchState.loading"
+            @click="emit('go-to-previous-page')"
+          >
+            ◀
+          </button>
+          <span>Page {{ displayPage }}<template v-if="searchState.maxPage">/{{ searchState.maxPage }}</template></span>
+          <button type="button" class="page-arrow page-arrow-next" :disabled="searchState.loading" @click="emit('go-to-next-page')">
+            ▶
+          </button>
+        </div>
+        <div class="page-jump-row">
+          <label class="page-jump">
+            <span>Page:</span>
+            <input :value="pageInput" type="text" inputmode="numeric" pattern="[0-9]*" @input="updatePageInput" />
+          </label>
+          <button type="button" :disabled="searchState.loading" @click="emit('go-to-page')">
+            Go
+          </button>
+        </div>
+      </div>
 
       <div class="table-wrap">
         <table>

@@ -431,22 +431,66 @@ p {
 }
 
 .desktop-tabs {
-  display: flex;
-  gap: 0.75rem;
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
 }
 
-.desktop-tabs .mobile-tab {
-  flex: 0 0 auto;
-  min-width: 8rem;
+.mobile-tabs,
+.desktop-tabs {
+  gap: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 14px;
+  background: var(--color-surface-muted);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-border) 85%, transparent);
 }
 
 .mobile-tab {
-  flex: 1;
+  flex: 0 0 auto;
+  min-width: max-content;
   text-align: center;
+  white-space: nowrap;
+  position: relative;
+  border: 0;
+  border-right: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-muted-strong);
+  padding: 0.75rem 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.mobile-tab:first-child {
+  border-top-left-radius: 13px;
+  border-bottom-left-radius: 13px;
+}
+
+.mobile-tab:last-child {
+  border-right: 0;
+  border-top-right-radius: 13px;
+  border-bottom-right-radius: 13px;
+}
+
+.mobile-tab:hover {
+  border-color: var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 48%, transparent);
 }
 
 .mobile-tab-active {
-  background: var(--color-tab-active);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow:
+    inset 0 -2px 0 var(--color-text),
+    0 0 0 1px color-mix(in srgb, var(--color-border-strong) 70%, transparent);
+  z-index: 1;
+}
+
+.mobile-tab-active:hover {
+  background: var(--color-surface);
 }
 
 .mobile-only {
@@ -756,7 +800,6 @@ th {
 
   .mobile-tabs {
     display: flex;
-    gap: 0.75rem;
   }
 
   .desktop-tabs {
