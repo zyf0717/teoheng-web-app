@@ -26,10 +26,6 @@ defineProps({
     type: Array,
     required: true,
   },
-  cloudMarker: {
-    type: String,
-    required: true,
-  },
   displayPage: {
     type: Number,
     required: true,
@@ -231,13 +227,13 @@ function updatePageInput(event) {
                     :data-test="`add-song-${song.id}`"
                     type="button"
                     class="button-secondary button-command"
-                    :disabled="isSongPending(song.id)"
-                    @click="emit('add-song', song.id)"
-                  >
-                    {{ isSongQueued(song.id) ? 'Del' : 'Add' }}<span v-if="song.cloud && !isSongQueued(song.id)" class="button-cloud"> ({{ cloudMarker }})</span>
-                  </button>
-                </div>
-              </td>
+                  :disabled="isSongPending(song.id)"
+                  @click="emit('add-song', song.id)"
+                >
+                  {{ isSongQueued(song.id) ? 'Del' : 'Add' }}
+                </button>
+              </div>
+            </td>
             </tr>
           </tbody>
           <tbody v-else>

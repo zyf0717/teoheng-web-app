@@ -621,10 +621,6 @@ th {
   gap: 0.75rem;
 }
 
-.button-cloud {
-  color: var(--color-muted);
-}
-
 .song-meta {
   display: grid;
   gap: 0.25rem;
@@ -795,7 +791,7 @@ th {
 
 @media (max-width: 900px) {
   .app-shell {
-    padding-top: 1rem;
+    padding: 1rem 0 calc(var(--command-bar-offset) + 1rem);
   }
 
   .main-panels {
@@ -812,6 +808,30 @@ th {
 
   .mobile-tabs.section-gap {
     margin-top: 0.25rem;
+  }
+
+  .mobile-tabs {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .mobile-tab:first-child,
+  .mobile-tab:last-child {
+    border-radius: 0;
+  }
+
+  .main-panels.section-gap {
+    margin-top: 0;
+  }
+
+  .mobile-panel {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 1rem;
   }
 
   .panel-heading {

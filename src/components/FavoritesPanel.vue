@@ -12,10 +12,6 @@ defineProps({
     type: Array,
     required: true,
   },
-  cloudMarker: {
-    type: String,
-    required: true,
-  },
   singerImageUrl: {
     type: Function,
     required: true,
@@ -95,7 +91,7 @@ const emit = defineEmits(['promote-song', 'add-song', 'favorite-song'])
                   :disabled="isSongPending(song.id)"
                   @click="emit('add-song', song.id)"
                 >
-                  {{ isSongQueued(song.id) ? 'Del' : 'Add' }}<span v-if="song.cloud && !isSongQueued(song.id)" class="button-cloud"> ({{ cloudMarker }})</span>
+                  {{ isSongQueued(song.id) ? 'Del' : 'Add' }}
                 </button>
               </div>
             </td>

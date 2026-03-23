@@ -19,7 +19,6 @@ import {
 import { resolveBaseUrl } from './lib/baseUrl'
 import {
   BASE_URL_QUERY_PARAM,
-  CLOUD_MARKER,
   DIAGNOSTIC_EVENT_LIMIT,
   FAVORITES_STORAGE_KEY,
   LANGUAGE_OPTIONS,
@@ -620,7 +619,6 @@ onBeforeUnmount(() => {
           :search-form="searchForm"
           :language-options="LANGUAGE_OPTIONS"
           :song-type-options="SONG_TYPE_OPTIONS"
-          :cloud-marker="CLOUD_MARKER"
           :display-page="displayPage"
           :page-input="pageInput"
           :singer-image-url="singerImageUrl"
@@ -662,7 +660,6 @@ onBeforeUnmount(() => {
           :active-mobile-tab="activeMobileTab"
           :active-browse-tab="activeBrowseTab"
           :favorite-songs="favoriteSongs"
-          :cloud-marker="CLOUD_MARKER"
           :singer-image-url="singerImageUrl"
           :is-song-queued="isSongQueued"
           :is-song-pending="isSongPending"
