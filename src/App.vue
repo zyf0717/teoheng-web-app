@@ -553,9 +553,9 @@ onMounted(() => {
       updateCommandBarOffset()
     })
     commandBarResizeObserver.observe(commandBarRef.value)
+  } else {
+    window.addEventListener('resize', updateCommandBarOffset)
   }
-
-  window.addEventListener('resize', updateCommandBarOffset)
 })
 
 onBeforeUnmount(() => {
@@ -573,7 +573,9 @@ onBeforeUnmount(() => {
 
   disposeDiagnostics()
 
-  window.removeEventListener('resize', updateCommandBarOffset)
+  if (!commandBarResizeObserver) {
+    window.removeEventListener('resize', updateCommandBarOffset)
+  }
 })
 </script>
 

@@ -47,6 +47,7 @@ body {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-bg);
+  overscroll-behavior-y: contain;
 }
 
 button,
@@ -120,6 +121,7 @@ pre {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem calc(var(--command-bar-offset) + 1rem);
+  overscroll-behavior-y: contain;
 }
 
 .hero-panel {
