@@ -552,209 +552,211 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main class="app-shell" :class="{ 'app-shell-command-bar-expanded': showMixerControls }">
-    <div class="mobile-tabs section-gap" role="tablist" aria-label="Main panels">
-      <button
-        data-test="mobile-tab-settings"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeMobileTab === 'settings' }"
-        :aria-selected="activeMobileTab === 'settings'"
-        @click="setBrowseTab('settings')"
-      >
-        Setup
-      </button>
-      <button
-        data-test="mobile-tab-top-hits"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeMobileTab === 'topHits' }"
-        :aria-selected="activeMobileTab === 'topHits'"
-        @click="setBrowseTab('topHits')"
-      >
-        Top Hits
-      </button>
-      <button
-        data-test="mobile-tab-singer"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeMobileTab === 'singer' }"
-        :aria-selected="activeMobileTab === 'singer'"
-        @click="setBrowseTab('singer')"
-      >
-        Singer
-      </button>
-      <button
-        data-test="mobile-tab-playlist"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeMobileTab === 'playlist' }"
-        :aria-selected="activeMobileTab === 'playlist'"
-        @click="setMobileTab('playlist')"
-      >
-        Playlist
-      </button>
-      <button
-        data-test="mobile-tab-favorites"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeMobileTab === 'favorites' }"
-        :aria-selected="activeMobileTab === 'favorites'"
-        @click="setBrowseTab('favorites')"
-      >
-        Favourites
-      </button>
-    </div>
-
-    <div class="desktop-tabs desktop-only section-gap" role="tablist" aria-label="Main panels">
-      <button
-        data-test="desktop-tab-settings"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeBrowseTab === 'settings' }"
-        :aria-selected="activeBrowseTab === 'settings'"
-        @click="setBrowseTab('settings')"
-      >
-        Setup
-      </button>
-      <button
-        data-test="desktop-tab-top-hits"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeBrowseTab === 'topHits' }"
-        :aria-selected="activeBrowseTab === 'topHits'"
-        @click="setBrowseTab('topHits')"
-      >
-        Top Hits
-      </button>
-      <button
-        data-test="desktop-tab-singer"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeBrowseTab === 'singer' }"
-        :aria-selected="activeBrowseTab === 'singer'"
-        @click="setBrowseTab('singer')"
-      >
-        Singer
-      </button>
-      <button
-        data-test="desktop-tab-favorites"
-        type="button"
-        class="mobile-tab"
-        :class="{ 'mobile-tab-active': activeBrowseTab === 'favorites' }"
-        :aria-selected="activeBrowseTab === 'favorites'"
-        @click="setBrowseTab('favorites')"
-      >
-        Favourites
-      </button>
-    </div>
-
-    <div class="main-panels section-gap">
-      <div class="primary-column stack">
-        <section
-          class="panel stack mobile-panel settings-panel"
-          :class="{
-            'mobile-panel-hidden': activeMobileTab !== 'settings',
-            'desktop-panel-hidden': activeBrowseTab !== 'settings',
-          }"
+  <div class="app-viewport">
+    <main class="app-shell" :class="{ 'app-shell-command-bar-expanded': showMixerControls }">
+      <div class="mobile-tabs section-gap" role="tablist" aria-label="Main panels">
+        <button
+          data-test="mobile-tab-settings"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeMobileTab === 'settings' }"
+          :aria-selected="activeMobileTab === 'settings'"
+          @click="setBrowseTab('settings')"
         >
-          <SettingsPanel
-            :base-url-input="baseUrlInput"
-            :base-url-error="baseUrlError"
-            :is-dark-mode="isDarkMode"
-            :mic-controlled-by-kod="micControlledByKod"
-            :report-status="diagnosticsState.reportStatus"
-            :support-email="SUPPORT_EMAIL"
-            note-placement="footer"
-            @download-report="downloadIssueReport"
-            @scanner-detected-base-url="handleScannedBaseUrl"
-            @save-base-url="saveBaseUrl"
-            @update:base-url-input="baseUrlInput = $event"
-            @update:is-dark-mode="setThemeOverride"
-            @update:mic-controlled-by-kod="micControlledByKod = $event"
-          />
-        </section>
-
-        <TopHitsPanel
-          :active-mobile-tab="activeMobileTab"
-          :active-browse-tab="activeBrowseTab"
-          :search-state="searchState"
-          :search-form="searchForm"
-          :language-options="LANGUAGE_OPTIONS"
-          :song-type-options="SONG_TYPE_OPTIONS"
-          :display-page="displayPage"
-          :page-input="pageInput"
-          :singer-image-url="singerImageUrl"
-          :is-favorite-song="isFavoriteSong"
-          :is-song-queued="isSongQueued"
-          :is-song-pending="isSongPending"
-          @go-to-setup="goToSetup"
-          @submit-search="submitSearch"
-          @reset-search="resetSearch"
-          @promote-song="promoteSong"
-          @add-song="addSong"
-          @favorite-song="addFavoriteSong"
-          @update:page-input="pageInput = $event"
-          @go-to-previous-page="goToPreviousPage"
-          @go-to-next-page="goToNextPage"
-          @go-to-page="goToPage"
-        />
-
-        <SingerPanel
-          :active-mobile-tab="activeMobileTab"
-          :active-browse-tab="activeBrowseTab"
-          :singer-state="singerState"
-          :singer-form="singerForm"
-          :singer-country-options="SINGER_COUNTRY_OPTIONS"
-          :singer-display-page="singerDisplayPage"
-          :singer-page-input="singerPageInput"
-          :singer-image-url="singerImageUrl"
-          @go-to-setup="goToSetup"
-          @submit-search="submitSingerSearch"
-          @reset-search="resetSingerSearch"
-          @search-top-hits-by-singer="searchTopHitsBySinger"
-          @update:singer-page-input="singerPageInput = $event"
-          @go-to-previous-page="goToPreviousSingerPage"
-          @go-to-next-page="goToNextSingerPage"
-          @go-to-page="goToSingerPage"
-        />
-
-        <FavoritesPanel
-          :active-mobile-tab="activeMobileTab"
-          :active-browse-tab="activeBrowseTab"
-          :favorite-songs="pagedFavoriteSongs"
-          :favorite-count="favoriteSongs.length"
-          :favorite-display-page="favoriteDisplayPage"
-          :favorite-page-input="favoritesPageInput"
-          :favorite-total-pages="favoriteTotalPages"
-          :favorites-transfer-status="favoritesTransferStatus"
-          :singer-image-url="singerImageUrl"
-          :is-song-queued="isSongQueued"
-          :is-song-pending="isSongPending"
-          @download-favorites="downloadFavorites"
-          @import-favorites="importFavorites"
-          @promote-song="promoteSong"
-          @add-song="addSong"
-          @favorite-song="addFavoriteSong"
-          @update:favorite-page-input="favoritesPageInput = $event"
-          @go-to-previous-page="goToPreviousFavoritesPage"
-          @go-to-next-page="goToNextFavoritesPage"
-          @go-to-page="goToFavoritesPage"
-        />
+          Setup
+        </button>
+        <button
+          data-test="mobile-tab-top-hits"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeMobileTab === 'topHits' }"
+          :aria-selected="activeMobileTab === 'topHits'"
+          @click="setBrowseTab('topHits')"
+        >
+          Top Hits
+        </button>
+        <button
+          data-test="mobile-tab-singer"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeMobileTab === 'singer' }"
+          :aria-selected="activeMobileTab === 'singer'"
+          @click="setBrowseTab('singer')"
+        >
+          Singer
+        </button>
+        <button
+          data-test="mobile-tab-playlist"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeMobileTab === 'playlist' }"
+          :aria-selected="activeMobileTab === 'playlist'"
+          @click="setMobileTab('playlist')"
+        >
+          Playlist
+        </button>
+        <button
+          data-test="mobile-tab-favorites"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeMobileTab === 'favorites' }"
+          :aria-selected="activeMobileTab === 'favorites'"
+          @click="setBrowseTab('favorites')"
+        >
+          Favourites
+        </button>
       </div>
 
-      <PlaylistPanel
-        :active-mobile-tab="activeMobileTab"
-        :playlist-state="playlistState"
-        :poll-interval-ms="POLL_INTERVAL_MS"
-        :is-favorite-song="isFavoriteSong"
-        :is-song-pending="isSongPending"
-        @promote-song="promoteSong"
-        @remove-song="removeSong"
-        @favorite-song="addFavoriteSong"
-      />
-    </div>
-  </main>
+      <div class="desktop-tabs desktop-only section-gap" role="tablist" aria-label="Main panels">
+        <button
+          data-test="desktop-tab-settings"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeBrowseTab === 'settings' }"
+          :aria-selected="activeBrowseTab === 'settings'"
+          @click="setBrowseTab('settings')"
+        >
+          Setup
+        </button>
+        <button
+          data-test="desktop-tab-top-hits"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeBrowseTab === 'topHits' }"
+          :aria-selected="activeBrowseTab === 'topHits'"
+          @click="setBrowseTab('topHits')"
+        >
+          Top Hits
+        </button>
+        <button
+          data-test="desktop-tab-singer"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeBrowseTab === 'singer' }"
+          :aria-selected="activeBrowseTab === 'singer'"
+          @click="setBrowseTab('singer')"
+        >
+          Singer
+        </button>
+        <button
+          data-test="desktop-tab-favorites"
+          type="button"
+          class="mobile-tab"
+          :class="{ 'mobile-tab-active': activeBrowseTab === 'favorites' }"
+          :aria-selected="activeBrowseTab === 'favorites'"
+          @click="setBrowseTab('favorites')"
+        >
+          Favourites
+        </button>
+      </div>
+
+      <div class="main-panels section-gap">
+        <div class="primary-column stack">
+          <section
+            class="panel stack mobile-panel settings-panel"
+            :class="{
+              'mobile-panel-hidden': activeMobileTab !== 'settings',
+              'desktop-panel-hidden': activeBrowseTab !== 'settings',
+            }"
+          >
+            <SettingsPanel
+              :base-url-input="baseUrlInput"
+              :base-url-error="baseUrlError"
+              :is-dark-mode="isDarkMode"
+              :mic-controlled-by-kod="micControlledByKod"
+              :report-status="diagnosticsState.reportStatus"
+              :support-email="SUPPORT_EMAIL"
+              note-placement="footer"
+              @download-report="downloadIssueReport"
+              @scanner-detected-base-url="handleScannedBaseUrl"
+              @save-base-url="saveBaseUrl"
+              @update:base-url-input="baseUrlInput = $event"
+              @update:is-dark-mode="setThemeOverride"
+              @update:mic-controlled-by-kod="micControlledByKod = $event"
+            />
+          </section>
+
+          <TopHitsPanel
+            :active-mobile-tab="activeMobileTab"
+            :active-browse-tab="activeBrowseTab"
+            :search-state="searchState"
+            :search-form="searchForm"
+            :language-options="LANGUAGE_OPTIONS"
+            :song-type-options="SONG_TYPE_OPTIONS"
+            :display-page="displayPage"
+            :page-input="pageInput"
+            :singer-image-url="singerImageUrl"
+            :is-favorite-song="isFavoriteSong"
+            :is-song-queued="isSongQueued"
+            :is-song-pending="isSongPending"
+            @go-to-setup="goToSetup"
+            @submit-search="submitSearch"
+            @reset-search="resetSearch"
+            @promote-song="promoteSong"
+            @add-song="addSong"
+            @favorite-song="addFavoriteSong"
+            @update:page-input="pageInput = $event"
+            @go-to-previous-page="goToPreviousPage"
+            @go-to-next-page="goToNextPage"
+            @go-to-page="goToPage"
+          />
+
+          <SingerPanel
+            :active-mobile-tab="activeMobileTab"
+            :active-browse-tab="activeBrowseTab"
+            :singer-state="singerState"
+            :singer-form="singerForm"
+            :singer-country-options="SINGER_COUNTRY_OPTIONS"
+            :singer-display-page="singerDisplayPage"
+            :singer-page-input="singerPageInput"
+            :singer-image-url="singerImageUrl"
+            @go-to-setup="goToSetup"
+            @submit-search="submitSingerSearch"
+            @reset-search="resetSingerSearch"
+            @search-top-hits-by-singer="searchTopHitsBySinger"
+            @update:singer-page-input="singerPageInput = $event"
+            @go-to-previous-page="goToPreviousSingerPage"
+            @go-to-next-page="goToNextSingerPage"
+            @go-to-page="goToSingerPage"
+          />
+
+          <FavoritesPanel
+            :active-mobile-tab="activeMobileTab"
+            :active-browse-tab="activeBrowseTab"
+            :favorite-songs="pagedFavoriteSongs"
+            :favorite-count="favoriteSongs.length"
+            :favorite-display-page="favoriteDisplayPage"
+            :favorite-page-input="favoritesPageInput"
+            :favorite-total-pages="favoriteTotalPages"
+            :favorites-transfer-status="favoritesTransferStatus"
+            :singer-image-url="singerImageUrl"
+            :is-song-queued="isSongQueued"
+            :is-song-pending="isSongPending"
+            @download-favorites="downloadFavorites"
+            @import-favorites="importFavorites"
+            @promote-song="promoteSong"
+            @add-song="addSong"
+            @favorite-song="addFavoriteSong"
+            @update:favorite-page-input="favoritesPageInput = $event"
+            @go-to-previous-page="goToPreviousFavoritesPage"
+            @go-to-next-page="goToNextFavoritesPage"
+            @go-to-page="goToFavoritesPage"
+          />
+        </div>
+
+        <PlaylistPanel
+          :active-mobile-tab="activeMobileTab"
+          :playlist-state="playlistState"
+          :poll-interval-ms="POLL_INTERVAL_MS"
+          :is-favorite-song="isFavoriteSong"
+          :is-song-pending="isSongPending"
+          @promote-song="promoteSong"
+          @remove-song="removeSong"
+          @favorite-song="addFavoriteSong"
+        />
+      </div>
+    </main>
+  </div>
 
   <div class="command-bar" :class="{ 'command-bar-expanded': showMixerControls }">
     <CommandBar

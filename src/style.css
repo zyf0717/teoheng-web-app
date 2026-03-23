@@ -39,18 +39,25 @@
   --command-bar-shadow: 0 -8px 24px rgba(2, 6, 23, 0.5);
 }
 
+html {
+  height: 100%;
+  overscroll-behavior-y: none;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
+  height: 100%;
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
   min-height: 100dvh;
   color: var(--color-text);
   background: var(--color-bg);
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none;
+  overflow: hidden;
 }
 
 button,
@@ -118,13 +125,23 @@ pre {
 
 #app {
   width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-viewport {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable both-edges;
 }
 
 .app-shell {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem calc(var(--command-bar-offset-collapsed) + var(--safe-area-bottom) + 1rem);
-  overscroll-behavior-y: contain;
 }
 
 .app-shell-command-bar-expanded {
@@ -834,6 +851,10 @@ th {
 }
 
 @media (max-width: 900px) {
+  .app-viewport {
+    scrollbar-gutter: auto;
+  }
+
   .app-shell {
     padding: 0 0 calc(var(--command-bar-offset-collapsed) + var(--safe-area-bottom) + 1rem);
   }
