@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>HUASEE</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="bottom-menu.css">
+  <link rel="stylesheet" href="bottom-menu-vol.css">
+  <link rel="stylesheet" href="singer-gallery.css">
+  <link rel="stylesheet" href="jquery.mobile/jquery.mobile-1.4.5.min.css">
+  <!-- Link Swiper's CSS -->
+  <link rel="stylesheet" href="./css/swiper-bundle.min.css">
+  <!-- adam引入阿里图标库 -->
+  <link rel="stylesheet" href="./font/iconfont.css">
+  <script src="jquery.mobile/jquery-1.11.1.min.js" type="text/javascript"></script>
+  <script src="jquery.mobile/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
+  <script src="en_us_demo_foreign.js" type="text/javascript"></script>
+  <!-- Swiper JS -->
+  <script src="./js/swiper-bundle.min.js"></script>
+
+  <style type="text/css">
+    body .gallery:after {
+      clear: both;
+      content: " ";
+      display: block;
+    }
+
+    .ui-icon-youxian:after {
+      background-image: url(images/icon/item_priority2.png);
+      -moz-background-size: 18px 18px;
+      -o-background-size: 18px 18px;
+      -webkit-background-size: 18px 18px;
+      background-size: 18px 18px;
+      border-radius: 6;
+    }
+
+    .ui-icon-custom-del:after {
+      background-image: url(images/icon/expand_op_delete_hl.png);
+      -moz-background-size: 18px 18px;
+      -o-background-size: 18px 18px;
+      -webkit-background-size: 18px 18px;
+      background-size: 18px 18px;
+      border-radius: 6;
+
+    }
+
+    .tipClass {
+      position: fixed;
+      bottom: 50%;
+      left: 50%;
+      margin-left: -100px;
+      width: 200px;
+      height: 50px;
+      color: white;
+      border-radius: 5px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      line-height: 10px;
+
+      text-shadow: none;
+      display: none;
+      z-index: 100000;
+      font-family: 微软雅黑, 宋体;
+    }
+
+    body .gallery {
+      padding-top: 10px;
+    }
+
+    body .gallery .gallery-item {
+      float: left;
+      margin-left: 2%;
+      padding-top: 5px;
+      width: 47%;
+      height: auto;
+      overflow: hidden;
+      list-style-type: none;
+      vertical-align: middle;
+      border-radius: 3px;
+    }
+
+    .gallery .gallery-item a {
+      display: block;
+      font-weight: normal;
+      text-decoration: none;
+    }
+
+    .gallery .gallery-item a img {
+      width: 100%;
+    }
+
+    .my-listview li {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: 60px;
+      list-style-type: none;
+      overflow: hidden;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+
+    .my-listview .itemclick {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: 100%;
+      height: 40px;
+      background-repeat: no-repeat;
+    }
+
+    /*#dededc*/
+    .my-listview .itemclick:active {
+      background-image: -webkit-linear-gradient(top, darkgray, #B8B8B8);
+    }
+
+    /*歌曲插播按钮*/
+    .my-listview .img-itemclick-songpro {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/song_priority.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .my-listview .img-itemclick-songpro:active {
+      background-image: url(images/icon/song_priority_click.png);
+    }
+
+    /*歌曲点歌按钮*/
+    .my-listview .img-itemclick-songadd {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/song_add.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .my-listview .img-itemclick-songadd:active {
+      background-image: url(images/icon/song_add_click.png);
+    }
+
+    /*删除按钮*/
+    .my-listview .img-itemclick-songdel {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/select_delete.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .my-listview .img-itemclick-songdel:active {
+      background-image: url(images/icon/select_delete_click.png);
+    }
+
+    /*原伴唱按钮*/
+    .img-itemclick-yc {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/main_yc.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-itemclick-yc:active {
+      background-image: url(images/icon/main_yc_click.png);
+    }
+
+    /*重唱按钮*/
+    .img-itemclick-replay {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/main_replay.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-itemclick-replay:active {
+      background-image: url(images/icon/main_replay_click.png);
+    }
+
+    /*音控按钮*/
+    .img-itemclick-vol {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/main_vol.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-itemclick-vol:active {
+      background-image: url(images/icon/main_vol_click.png);
+    }
+
+    /*切歌按钮*/
+    .img-itemclick-skip {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/main_skip.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-itemclick-skip:active {
+      background-image: url(images/icon/main_skip_click.png);
+    }
+
+    /*切歌按钮*/
+    .img-itemclick-play {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/main_play.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-itemclick-play:active {
+      background-image: url(images/icon/main_play_click.png);
+    }
+
+    /*首页按钮*/
+    .img-itemclick-home {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/main_home.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-itemclick-home:active {
+      background-image: url(images/icon/main_home_click.png);
+    }
+
+    /*已点按钮*/
+    .img-itemclick-select {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/main_select.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-itemclick-select:active {
+      background-image: url(images/icon/main_select_click.png);
+    }
+
+    /*搜索图标按下效果*/
+    .img-click-seach {
+      border: 100%, auto;
+      border-radius: 3px;
+      width: auto;
+      height: auto;
+      background-repeat: no-repeat;
+      background-image: url(images/icon/seach.png);
+      background-size: cover;
+    }
+
+    /*#dededc*/
+    .img-click-seach:active {
+      background-image: url(images/icon/seach_click.png);
+    }
+
+    .my-listview li a {
+      float: left;
+      max-width: 55%;
+      margin-left: 10px;
+      margin-top: -12px;
+      border-radius: 3px;
+    }
+
+    .my-listview li a:active {
+      color: gray;
+    }
+
+    .my-listview li a h4 {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .my-listview li div a h4 {
+      float: left;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin-top: 6px;
+      margin-right: -8px;
+      max-width: 60px;
+      min-width: 60px;
+      text-align: left;
+    }
+
+    .my-listview-singer-photo {
+      /*#-webkit-box-shadow: #999 0 3px 5px;
+                    #-moz-box-shadow: #999 0 3px 5px;
+                    #box-shadow: #999 0 3px 5px;*/
+      border-radius: 50px;
+      width: 50px;
+      height: 50px;
+      vertical-align: middle;
+    }
+
+    .imgCenter {
+      max-height: 100%;
+      max-width: 100%;
+      vertical-align: middle;
+      /*outline: 1px solid #000;*/
+    }
+
+    #controlgroup {
+      position: absolute;
+      right: 10px;
+      margin-top: 16px;
+    }
+
+    .mySwiper {
+      width: 100%;
+      height: 200px;
+
+    }
+
+    .mySwiper.hidden {
+      display: none;
+    }
+
+    .swiper-container {
+      width: 100%;
+      height: 45px;
+      line-height: 50px;
+      background-color: #ffffff;
+    }
+
+    .swiper-slide {
+     color: #858988;
+  text-align: center;
+  font-size: 15px;
+  background: transparent;
+  width: auto;
+  height: 45px;
+  padding-left: 15px; /* 新增：左边留出 15px */
+  padding-right: 15px; /* 可选：右边也留点空间，保持对齐 */
+    }
+
+    .swiper-slide.on {
+      color: #000000 !important;
+    }
+
+    .swiper-container-songlang {
+      width: 100%;
+      height: 45px;
+      line-height: 50px;
+      background-color: #ffffff;
+    }
+
+   
+
+
+    input.text {
+      text-align: center;
+      padding: 10px 10px
+    }
+
+    .seachclick {
+      border: 25px, 25px;
+      border-radius: 3px;
+      width: 15px;
+      height: 15px;
+      background-repeat: no-repeat;
+      /*background-image: -webkit-linear-gradient(top, #fff, #FFFFFF);*/
+      background-image: url(images/icon/seach.png);
+    }
+
+    /*#dededc*/
+    .seachclick:active {
+      /*background-image: -webkit-linear-gradient(top, darkgray, #B8B8B8);*/
+      background-image: url(images/icon/seach_click.png);
+    }
+
+    /* adam增加新样式查询方式 *
+        /* 你自己的歌曲 */
+    .h4text {
+      /* margin-top: 30px; */
+      margin-bottom: 30px;
+      font-weight: 700;
+      text-shadow: none;
+      color: #f74f0c
+    }
+
+    /* 选歌方式按钮样式 */
+
+    .select-btn {
+      animation-duration: .1ms;
+      animation-name: mui-node-inserted;
+      font-weight: 500;
+      line-height: 18px;
+      color: rgba(0, 0, 0, .87);
+      background-color: #fff;
+      transition: all .2s ease-in-out;
+      display: inline-block;
+      height: 100px;
+      padding: 0 26px;
+      margin-top: 6px;
+      margin-bottom: 6px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      touch-action: manipulation;
+      background-image: none;
+      text-align: center;
+      line-height: 36px;
+      vertical-align: middle;
+      white-space: nowrap;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+      font-size: 14px;
+      letter-spacing: .03em;
+      position: relative;
+      overflow: hidden
+    }
+
+    /* 999999999999999999999999 */
+    /* 提示文字颜色  */
+    .tip {
+      margin: 8px 16px;
+      padding: 8px;
+      color: #990;
+      background-color: #ffc;
+      border: 1px solid #990;
+
+    }
+
+    /* 阿里图标字体显示颜色 */
+    .select-hot {
+      font-size: 30px;
+      color: rgb(241, 189, 17);
+    }
+
+    .select-youtube {
+      font-size: 30px;
+      color: #f74f0c;
+    }
+
+    .select-new {
+      font-size: 30px;
+      color: #559cfa;
+    }
+
+    .select-singer {
+      font-size: 30px;
+      color: #f14b82;
+    }
+
+    .select-like {
+      font-size: 30px;
+      color: #22f5d2;
+    }
+
+    .select-selected {
+      font-size: 30px;
+      color: #ca76f1;
+    }
+
+    .select-set {
+      font-size: 30px;
+      color: #3a3a3a;
+    }
+
+    .select-feedback {
+      font-size: 30px;
+      color: #7072e6;
+    }
+
+    .select-songname {
+      font-size: 30px;
+      color: #33dfff;
+
+    }
+
+    .select-type {
+      font-size: 30px;
+      color: #4df0b9;
+    }
+
+
+    /* 控制按钮 */
+    .select-yc {
+      font-size: 30px;
+      color: #ffffff;
+
+    }
+ /* 设置热门图标为黑色 */
+    .icon-remen {
+      color: #f76505 !important;
+    }
+ /* 设置热门图标为黑色 */
+    .icon-zuixin1 {
+      color: #f76505 !important;
+    }
+    
+
+
+
+    .swiper-container.hidden {
+      display: none;
+    }
+
+    .container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .image {
+      width: 100%;
+      height: auto;
+    }
+
+    
+
+    .buttonmenu {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      height: 48px;
+      line-height: 48px;
+      margin-top: 4px;
+      padding-top: 0px;
+    }
+
+    /* adam 用户弹出模态框样式 */
+    /* 模态框背景 */
+   /* 优化后的模态框样式 - 更紧凑、灰白色设计 */
+.modal-content {
+  background-color: #f5f5f5; /* 浅灰色背景 */
+  margin: 10% auto;
+  padding: 16px;
+  border: 1px solid #ccc;
+  width: 85%;
+  max-width: 360px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* 关闭按钮样式 */
+.close {
+  color: #666;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close:hover,
+.close:focus {
+  color: #333;
+}
+
+/* 表单标签和输入框样式 */
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+input[type="number"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+/* 登录按钮样式 */
+#btnlogin {
+  width: 100%;
+  padding: 10px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#btnlogin:hover {
+  background-color: #5a6268;
+}
+
+/* 提示信息 */
+#loginMessage {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #dc3545;
+}
+
+/* adam移除页面背景图片 */
+#pageone {
+    background-image: none !important;
+    background-color: #ffffff; /* 使用纯白色背景 */
+}
+
+/* 移除头部背景图片 */
+.bottom-menu[data-role="header"] {
+    background-image: none !important;
+    background-color: #ffffff; /* 保持原有颜色风格 */
+}
+
+/* 移除主菜单背景图片 */
+#mainmenu.gallery {
+    background-image: none !important;
+    background-color: #f5f5f5; /* 使用浅灰色背景 */
+}
+
+/* adam移除底部菜单背景图片 */
+.bottom-menu[data-role="footer"] {
+     background-image: none !important;
+        background-color: #ffffff !important;
+        opacity: 1 !important;
+        border: none !important;
+    
+}
+/* 覆盖jQuery Mobile框架的默认样式 */
+    .ui-page .ui-footer {
+        background: #ffffff !important;
+        border: none !important;
+        opacity: 1 !important;
+    }
+    
+    .ui-footer .bottom-menu {
+        background-color: #ffffff !important;
+        background-image: none !important;
+        opacity: 1 !important;
+    }
+    
+    /* 确保底部菜单内的列表项也有背景 */
+    .ui-footer .bottom-menu ul,
+    .ui-footer .bottom-menu li {
+        background: none !important;
+        background-color: transparent !important;
+    }
+    
+
+
+/* 移除弹出菜单背景图片 */
+#popupMenu > div:first-child {
+    background-image: none !important;
+    background-color: #f06e18; /* 使用深蓝色背景 */
+}
+/* 修改主要文字颜色 */
+#singer-name,
+#type-font1, #type-font2, #type-font3, #type-font4,
+#type-font5, #type-font6, #type-font7, #type-font8,
+#singer-font1, #singer-font2 {
+    color: #000000 !important; /* 改为黑色 */
+}
+
+/* 修改列表文字颜色 */
+.my-listview li div font[size="4"] {
+    color: #000000 !important; /* 改为黑色 */
+}
+
+/* 修改搜索框文字 */
+#search-input,
+#singer-input {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+/* 修改按钮文字颜色 */
+.select-btn {
+    color: #000000 !important;
+}
+/*adam文字停留状态 */
+        .bottom-menu {
+      background-color: #f06e18 !important;
+    }
+
+    /* 移除底部菜单背景图片 */
+    .bottom-menu[data-role="footer"] {
+        background-image: none !important;
+        background-color: #ffffff !important; /* 使用白色背景 */
+    }
+
+    .text-switch {
+      color: #000000;
+      margin-top: 8px;
+      font-size: 30px;
+      transition: color 0.5s;
+      text-shadow: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .button-text {
+      display: block;
+      font-size: 12px;
+      color: #000000;
+      margin-top: 18px;
+      text-shadow: none;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    /* 头部标题样式 */
+    #home_title {
+      text-shadow: none;
+      margin-top: 15px;
+      text-align: center;
+      color: #FFFFFF;
+    }
+
+    /* 头部菜单首页文字样式 */
+    .bottom-menu[data-role="header"] .home-text {
+      font-size: 12px;
+      color: #ffffff;
+      margin-top: 12px;
+      text-shadow: none;
+      position: relative;
+      z-index: 1;
+      display: block;
+      text-align: center;
+    }
+
+    /* 确保头部菜单中的首页图标为白色 */
+    .bottom-menu[data-role="header"] .icon-home.select-yc.text-switch {
+      color: #ffffff !important;
+    }
+ /* 确保头部菜单中的首页文字为白色 */
+    .bottom-menu[data-role="header"] .icon-home.select-yc.text-switch ~ .home-text {
+      color: #ffffff !important;
+    }
+    .bottom-menu[data-role="header"] .icon-my.select-yc.text-switch {
+      color: #ffffff !important;
+    }
+    /* 确保头部菜单中的首页文字为白色 */
+    .bottom-menu[data-role="header"] .icon-my.select-yc.text-switch ~ .home-text {
+      color: #ffffff !important;
+    }
+
+    /* 底部菜单默认状态 - 黑色 */
+    .bottom-menu[data-role="footer"] .iconfont,
+    .bottom-menu[data-role="footer"] .text-switch,
+    .bottom-menu[data-role="footer"] .button-text {
+      color: #000000;
+    }
+
+    /* 底部菜单激活状态 - 橙色 */
+    .bottom-menu[data-role="footer"] .buttonmenu:active .iconfont,
+    .bottom-menu[data-role="footer"] .buttonmenu:active .text-switch,
+    .bottom-menu[data-role="footer"] .buttonmenu:active .button
+.icon-youtube {
+    color: #FF0000;
+    font-size: 24px;
+}
+ .my-listview {
+    -webkit-overflow-scrolling: touch; /* 启用硬件加速滚动 */
+    transform: translateZ(0); /* 触发硬件加速 */
+    will-change: scroll-position; /* 提示浏览器该元素将改变滚动位置 */
+  }
+  
+  .my-listview li {
+    border: 100%, auto;
+    border-radius: 3px;
+    width: auto;
+    height: 60px;
+    list-style-type: none;
+    overflow: hidden;
+    margin-left: 5px;
+    margin-right: 5px;
+    transform: translateZ(0); /* 为每个列表项启用硬件加速 */
+    will-change: transform; /* 提示即将改变 */
+  }
+
+.my-listview {
+    -webkit-overflow-scrolling: touch; /* 启用硬件加速滚动 */
+    transform: translateZ(0); /* 触发硬件加速 */
+    will-change: scroll-position; /* 提示浏览器该元素将改变滚动位置 */
+  }
+  
+  .my-listview li {
+    border: 100%, auto;
+    border-radius: 3px;
+    width: auto;
+    height: 60px;
+    list-style-type: none;
+    overflow: hidden;
+    margin-left: 5px;
+    margin-right: 5px;
+    transform: translateZ(0); /* 为每个列表项启用硬件加速 */
+    will-change: transform; /* 提示即将改变 */
+  }
+
+  /* 简洁的loading样式 */
+  .simple-loader {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #f06e18;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 10px auto;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+ .set-menu-sound li a:active,
+    .set-menu-sound li a.active {
+      background-color: #f06e18;
+      border-radius: 5px;
+      transform: scale(0.95);
+    }
+
+    .set-menu-sound li a {
+      transition: all 0.2s ease;
+    }
+
+  </style>
+</head>
+
+<body>
+
+
+  <!-- 模态框 -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h2 style="margin-top: 0; font-size: 18px; color: #333;">Collection</h2>
+    <form id="loginForm">
+      <label for="username">Mobile number:</label>
+      <input type="number" id="username" name="username" required>
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required pattern="\d+" title="Please enter password">
+
+      <button type="submit" id="btnlogin">Login</button>
+      <p id="loginMessage" style="color: red; margin-top: 8px;"></p>
+    </form>
+  </div>
+</div>
+  <!--onclick="OnLoginClick()"-->
+  <!-- <div data-role="page" id="pageone"
+    style="width:100%;height: 100%; background-image: url(images/icon/song_bg.png);background-repeat: no-repeat;background-size: cover;"> -->
+    <div data-role="page" id="pageone">
+    <!--头部-->
+    <!-- <div class="bottom-menu" data-role="header" data-position="fixed"
+      style="height:50px; background-image: url(images/icon/main_top.png);border-top:0px;border-bottom:0px;"> -->
+<div class="bottom-menu" data-role="header" data-position="fixed">
+      <li style="width: 13%;">
+        <div onclick="OnHomePage()" class="buttonmenu">
+          <div style="height:10px; position:relative;z-index: 2;">
+            <span class="iconfont icon-home select-yc text-switch"></span>
+          </div>
+         <span class="button-text home-text">Main</span>
+            
+        </div>
+      </li>
+      <li style="width: 74%;">
+        <h4 id="home_title" >Main</h4>
+      </li>
+
+      <li style="width: 13%;">
+        <!-- <div onclick="OnNavMenuClick(4)" class="buttonmenu"> -->
+        <!-- <a href="http://localhost/mobile/login"> -->
+        <!-- <div  class="buttonmenu" id="loginBtn">
+
+                        <div style="height:10px; position:relative;z-index: 2;">
+                            <span class="iconfont icon-my  select-yc text-switch"></span>
+                        </div>
+                        <font size="1" color="#FFFFFF" style="margin-top:12px;text-shadow:none;position:relative;z-index: 1;">我的</font>
+                    </div> -->
+        <!-- </a> -->
+        <div class="buttonmenu">
+
+          <div style="height:10px; position:relative;z-index: 2;">
+            <span class="iconfont icon-my select-yc text-switch" id="loginBtn"></span>
+            <!--                    onclick="OnShowLogin()"-->
+          </div>
+          <font size="1" color="#FFFFFF" style="margin-top:12px;text-shadow:none;position:relative;z-index: 1;">Me
+          </font>
+
+      </li>
+
+    </div>
+
+    <!-- 定义弹出窗口 -->
+
+
+    <!--中间-->
+    <div id="content">
+
+      <!-- Swiper -->
+      <div class="swiper mySwiper" id="bannerswiper">
+        <div class="swiper-wrapper" id="swiper-wrapper">
+          <!-- \\滚动swiper显示位置 -->
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+      <!--主菜单-->
+      <section id="mainmenu" class="gallery"
+        style="padding-top: 10px;background-image: url(images/icon/main_bg.png); background-repeat: no-repeat;background-size: cover;">
+        <li class="gallery-item">
+
+          <a class="select-btn" href="#" onclick="OnMainMenuClick(1)">
+            <span class="iconfont icon-remen select-hot"></span>
+            <br><!-- react-text: 434 -->Top Hits<!-- /react-text --></a>
+        </li>
+
+        <li class="gallery-item">
+
+          <a class="select-btn" href="#" onclick="OnSearchYoutubeClick('youtube', 'TopByYoutube')">
+            <span class="iconfont icon-youtube3  select-youtube"></span>
+            <br><!-- react-text: 439 -->YouTube<!-- /react-text --> </a>
+        </li>
+         <li class="gallery-item">
+
+          <a class="select-btn" href="#" onclick="SearchBySortNewSongText('字幕', '字幕')">
+            <span class="iconfont icon-wuzimu  select-new"></span>
+            <br><!-- react-text: 445 -->Romanise<!-- /react-text --></a>
+        </li>
+        <li class="gallery-item">
+
+          <a class="select-btn" href="#" onclick="OnMainMenuClick(2)">
+            <span class="iconfont icon-gexing1 select-singer"></span>
+            <br><!-- react-text: 450 -->Top Singer<!-- /react-text --></a>
+        </li>
+        <li class="gallery-item">
+
+          <a class="select-btn" href="#" onclick="OnMainMenuClick(4)">
+            <span class="iconfont icon-shangcheng_KTV select-songname"></span>
+            <br><!-- react-text: 450 -->Language<!-- /react-text --></a>
+        </li>
+
+        <li class="gallery-item">
+
+          <a class="select-btn" href="#" onclick="OnMainMenuClick(5)">
+            <span class="iconfont icon-leibie2 select-type"></span>
+            <br><!-- react-text: 450 -->Category<!-- /react-text --></a>
+        </li>
+        <!-- <h4 class="h4text">你的歌</h4> -->
+
+        <li class="gallery-item">
+          <a class="select-btn" href="#" onclick="SearchByCollectSong('收藏', 'TopByCollect')">
+            <span class="iconfont icon-xihuan  select-like"></span>
+            <br><!-- react-text: 458 -->Favourites<!-- /react-text --></a>
+        </li>
+
+        <li class="gallery-item">
+
+          <a class="select-btn" href="#" onclick="OnNavMenuClick(1)">
+            <span class="iconfont icon--KTV select-selected"></span>
+            <br><!-- react-text: 464 -->History<!-- /react-text --></a>
+        </li>
+
+
+      </section>
+
+      <!--已点歌曲搜索结果-->
+      <div id="select-search" style="text-shadow:none;display:none">
+        <div id="select-list" class="my-listview" style="padding-top:15px">
+          <!-- 列表模板 -->
+          <li id="select-item" style="text-shadow:none;display:none">
+            <div style="width: 100%;height: 59px;z-index: 4;">
+              <div style="width: 70%;height: 59px;line-height:59px;float: left;padding-left: 15px;">
+                <div id="songname" style="height:18px; margin-top: -8px;">
+                  <font size="4" style="text-shadow:none" color="#FFFFFF">1.SongName</font>
+                </div>
+                <font size="2" style="text-shadow:none" color="#B8B8B8">1.Singer</font>
+              </div>
+              <div style="width: 30%;height: auto;float: left;" id="controlgroup" data-role="controlgroup"
+                data-type="horizontal">
+                <a class="img-itemclick-songpro" onclick="SetToNextPlay(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left: 10px;">
+                </a>
+                <a class="img-itemclick-songdel" onclick="DelSongInList(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left:20px;">
+                </a>
+              </div>
+            </div>
+            <div id="select-itme-line"
+              style="background-color: grey; width: 100%; height: 0.5px; border-top:0px; border-bottom:0px;z-index: 15;">
+            </div>
+          </li>
+        </div>
+      </div>
+
+      <!--已唱歌曲搜索结果-->
+      <div id="select-sung-search" style="text-shadow:none;display:none">
+        <div id="select-sung-list" class="my-listview" style="padding-top:15px">
+          <!-- 列表模板 -->
+          <li id="select-sung-item" style="text-shadow:none;display:none">
+            <div style="width: 100%;height: 59px;z-index: 4;">
+              <div style="width: 85%;height: 59px;line-height:59px;float: left;padding-left: 15px;">
+                <div style="height:18px; margin-top: -8px;">
+                  <font size="4" style="text-shadow:none" color="#000000">1.SongName</font>
+                </div>
+                <font size="2" style="text-shadow:none" color="#B8B8B8">1.Singer</font>
+              </div>
+              <div style="width: 15%;height: auto;float: left;" id="controlgroup" data-role="controlgroup"
+                data-type="horizontal">
+                <a style="width: 35px;height: 35px; margin-top:-5px; margin-left: 10px;">
+                  <img class="img-itemclick" onclick="SungReplay(id)" src="images/icon/select_replay.png"
+                    style="width: 32px;height: 32px;" />
+                </a>
+              </div>
+            </div>
+            <div id="sung-itme-line"
+              style="background-color: gainsboro; width: 100%; height: 0.5px; border-top:0px; border-bottom:0px;z-index: 15;">
+            </div>
+          </li>
+        </div>
+      </div>
+
+      <div id="collect-search" style="text-shadow:none;display:none">
+        <div id="collect-list" class="my-listview" style="padding-top:15px">
+          <!-- 列表模板 -->
+          <li id="collect-item" style="text-shadow:none;display:none">
+            <div style="width: 100%;height: 59px;z-index: 4;">
+              <div style="width: 70%;height: 59px;line-height:59px;float: left;padding-left: 15px;">
+                <div id="songname" style="height:18px; margin-top: -8px;">
+                  <font size="4" style="text-shadow:none" color="#FFFFFF">1.SongName</font>
+                </div>
+                <font size="2" style="text-shadow:none" color="#B8B8B8">1.Singer</font>
+              </div>
+              <div style="width: 30%;height: auto;float: left;" id="controlgroup" data-role="controlgroup"
+                data-type="horizontal">
+                <a class="img-itemclick-songpro" onclick="SetToNextPlay(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left: 10px;">
+                </a>
+                <a class="img-itemclick-songdel" onclick="DelSongInList(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left:20px;">
+                </a>
+              </div>
+            </div>
+            <div id="select-itme-line"
+              style="background-color: grey; width: 100%; height: 0.5px; border-top:0px; border-bottom:0px;z-index: 15;">
+            </div>
+          </li>
+        </div>
+      </div>
+      <!--        <a href="#" style="width:30px;height:30px" data-role="button" data-mini="true" data-icon="youxian" data-iconpos="notext" onclick="SetToNextPlay(id)"></a>
+            <a href="#" style="width:30px;height:30px" data-role="button" data-mini="true" data-icon="custom-del" data-iconpos="notext" onclick="DelSongInList(id)"></a>
+    -->
+      <!--U盘歌曲搜索结果-->
+      <div id="disk-search" style="display:none">
+        <div id="disk-listview" class="my-listview" style="padding: top 15px">
+          <!-- 列表模板 -->
+          <!-- <li id="disk-listitem" style="display:none">
+            <a onclick="AddToPlayList(id)">
+              <h4>1.SongName</h4>
+            </a>
+            <div id="controlgroup" data-role="controlgroup" data-type="horizontal">
+              <a onclick="AddToPlayList(id)">
+                <h4>1.Singer</h4>
+              </a>
+              <a href="#" data-role="button" data-icon="plus" data-iconpos="notext" onclick="AddToPlayList(id)"></a>
+              <a href="#" data-role="button" data-mini="true" data-icon="youxian" data-iconpos="notext"
+                onclick="SetToNextPlay(id)"></a>
+            </div>
+
+            <div class="itemclick" onclick="AddToPlayList(id)"></div>
+          </li> -->
+
+          <li id="listitem" style="text-shadow:none;display:none">
+            <div style="width: 100%;height: 59px;z-index: 4;">
+              <!-- 增加歌手图片显示区域 -->
+              <div style="width: 20%;height: 59px;line-height:59px;float: left;">
+                <img style="margin-left: 10px;" src="singer/singer_photo.png" class="my-listview-singer-photo" />
+              </div>
+              <div style="width: 50%;height: 59px;line-height:59px;float: left;padding-left: 10px;"
+                onclick="openPlayWindow('{songBM}')">
+                <div id="songname" style="height:18px; margin-top: -8px;">
+                  <font size="4" style="text-shadow:none" color="#FFFFFF">1.SongName</font>
+                  <font size="3" style="text-shadow:none" color="#FF0000">1.CLOUD</font>
+                </div>
+                <font size="2" style="text-shadow:none" color="#B8B8B8">1.Singer</font>
+              </div>
+              <div style="width: 30%;height: auto;float: left;" id="controlgroup" data-role="controlgroup"
+                data-type="horizontal">
+                <a class="img-itemclick-songpro" onclick="SetToNextPlay(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left: 10px;">
+                </a>
+                <a class="img-itemclick-songadd" onclick="AddToPlayList(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left:20px;">
+                </a>
+              </div>
+            </div>
+            <div id="singer-itme-line"
+              style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px;border-top:0px; border-bottom:0px;z-index: 15;">
+            </div>
+          </li>
+
+
+        </div>
+
+        <!--分页处理-->
+        <div id="disk-paging" data-role="footer" data-theme="none"
+          style="float:right; padding-bottom:25px;border:0px;display:none">
+          <table width="100%">
+            <tr>
+              <td style="text-shadow:none;table-layout:fixed">
+                <a id="disk-currpage">0</a>
+              </td>
+              <td style="text-shadow:none;table-layout:fixed">
+                <a id="disk-maxpage">/0</a>
+              </td>
+              <td id="disk-prevpage" style="text-shadow:none">
+                <input type="button" data-mini=true style="width: 100px;" onclick="OnPrevPageClick()" value="PageUp">
+              </td>
+              <td id="disk-nextpage" style="text-shadow:none">
+                <input type="button" data-mini=true style="width: 100px;" onclick="OnNextPageClick()" value="PageDown">
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!--歌曲搜索结果-->
+      <div id="search-page" style="text-shadow:none;display:none">
+        <!--查找菜单-->
+        <!--<div id="search-item" style="width="100%";height="5%";position:fixed;margin-top:0px;background-color:black;>
+                        <table>
+                            <tr>
+                                <td width="99%" height="25px" style="table-layout:fixed">
+                                    <input id="singer-input" class="text" data-mini="true" value="" placeholder="请输入您要搜索的歌名" style="background:transparent;border:1px solid #ffffff"/>
+                                </td>
+                                <td width="1%" height="25px" style="table-layout:fixed">
+                                    <div id="img_seach_click" onclick="OnSearchClick()" style="width: 32px;height: 32px;background-image: url(images/icon/seach.png); margin-top:0px; margin-right:15px;" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>-->
+        <div id="search-item" style="margin-top:0px;">
+          <table width="100%" style="margin-top:0px;">
+            <!--background-image: url(images/icon/seach_bg.png)-->
+            <tr>
+              <td width="99%" style="text-shadow:none;table-layout:fixed" nowrap>
+                <input id="search-input" type="text" data-mini="true" value="" placeholder="Song title such as: I LoveYoung You or ILY"
+                  style="text-align:center" />
+              </td>
+              <td width="1%" height="25px" style="table-layout:fixed">
+                <img class="img-click-seach" src="images/icon/transparent.png"
+                  style="width: 25px;height: 25px; margin-top:5px; margin-right:15px;" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!--查找选项-->
+        <div id="song-navbar" data-role="navbar" data-grid="c" class="swiper-container-songlang">
+          <div class="swiper-wrapper">
+            <div id="songlang_all" class="swiper-slide on" style="text-shadow:none;" onclick="SetSongLang('全部')">All
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('国语')">Mandarin
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('粤语')">Cantonese
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('闽语')">Hokkien
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('英语')">English
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('日语')">Japanese
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('韩语')">Korean
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('泰语')">Thai
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('越南语')">Vietnamese
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('柬埔寨语')">Khmer
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('缅甸语')">Burmese
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('老挝语')">Lao
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('印度语')">Hindi
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('巫语')">Malay
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('印尼语')">Indonesian
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('菲律宾语')">Philippines
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('俄语')">Russian
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('法语')">French
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div class="swiper-slide" style="text-shadow:none;" onclick="SetSongLang('其他')">Other
+            </div>
+          </div>
+          <!-- Add Pagination
+                            <div class="swiper-pagination"></div> -->
+        </div>
+
+        <!--搜索结果-->
+        <!-- <div id="listview" class="my-listview" style="padding-top:0px"> -->
+        <!-- 列表模板none inline -->
+        <!-- <li id="listitem" style="text-shadow:none;display:none">
+            <div style="width: 100%;height: 59px;z-index: 4;">
+              <div style="width: 70%;heighsinger-gallerysinger-galleryt: 59px;line-height:59px;float: left;padding-left: 15px;"
+                onclick="openPlayWindow('{songBM}')">
+                <div id="songname" style="height:18px; margin-top: -8px;">
+                  <font size="4" style="text-shadow:none" color="#FFFFFF">1.SongName</font>
+                  <font size="3" style="text-shadow:none" color="#FF0000">1.CLOUD</font>
+                </div>
+                <font size="2" style="text-shadow:none" color="#B8B8B8">1.Singer</font>
+              </div>
+              <div style="width: 30%;height: auto;float: left;" id="controlgroup" data-role="controlgroup"
+                data-type="horizontal">
+                <a class="img-itemclick-songpro" onclick="SetToNextPlay(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left: 10px;">
+                </a>
+                <a class="img-itemclick-songadd" onclick="AddToPlayList(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left:20px;">
+                </a>
+              </div>
+            </div>
+            <div id="singer-itme-line"
+              style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px;border-top:0px; border-bottom:0px;z-index: 15;">
+            </div>
+          </li> -->
+        <!-- </div> -->
+        <!-- 修改 #listview 中的列表模板 -->
+        <!-- 修改 #listview 中的列表模板 -->
+        <div id="listview" class="my-listview" style="padding-top:15px">
+          <!-- 列表模板none inline -->
+          <li id="listitem" style="text-shadow:none;display:none">
+            <div style="width: 100%;height: 50px;z-index: 4;">
+              <!-- 增加歌手图片显示区域 -->
+              <div style="width: 20%;height: 50px;line-height:50px;float: left;">
+                <img style="margin-left: 10px;" src="singer/singer_photo.png" class="my-listview-singer-photo" />
+              </div>
+              <div style="width: 50%;height: 50px;line-height:50px;float: left;padding-left: 10px;"
+                onclick="openPlayWindow('{songBM}')">
+                <div id="songname" style="height:18px; margin-top: -8px;">
+                  <font size="4" style="text-shadow:none" color="#FFFFFF">1.SongName</font>
+                  <font size="3" style="text-shadow:none" color="#FF0000">1.CLOUD</font>
+                </div>
+                <font size="2" style="text-shadow:none" color="#B8B8B8">1.Singer</font>
+              </div>
+              <div style="width: 30%;height: auto;float: left;" id="controlgroup" data-role="controlgroup"
+                data-type="horizontal">
+                <a class="img-itemclick-songpro" onclick="SetToNextPlay(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left: 10px;">
+                </a>
+                <a class="img-itemclick-songadd" onclick="AddToPlayList(id)"
+                  style="width: 32px;height: 32px; margin-top:-5px; margin-left:20px;">
+                </a>
+              </div>
+            </div>
+            <div id="singer-itme-line"
+              style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px;border-top:0px; border-bottom:0px;z-index: 15;">
+            </div>
+          </li>
+        </div>
+
+
+        <!--分页处理-->
+        <div id="search-paging" data-role="footer" data-theme="none"
+          style="float:right; padding-bottom:25px;border:0px;">
+          <table width="100%">
+            <tr>
+              <td style="text-shadow:none;table-layout:fixed">
+                <a id="search-currpage">0</a>
+              </td>
+              <td style="text-shadow:none;table-layout:fixed">
+                <a id="search-maxpage">/0</a>
+              </td>
+             <td id="search-prevpage" style="text-shadow:none">
+                <button type="button" onclick="OnPrevPageClick()" style="width: 120px; height: 33px; left: 0px; background-color: #f17510; color: white; border: none; border-radius: 5px;">PageUp
+                </button>
+              </td>
+              <td id="search-nextpage" style="text-shadow:none;width: 80px;">
+                <button type="button" onclick="OnNextPageClick()" style="width: 120px; height: 33px; left: 10px; background-color: #f17510; color: white; border: none; border-radius: 5px;">PageDown
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!--歌手查找结果-->
+
+      <div id="singer-search" style="display:none">
+        <!--查找菜单-->
+        <div id="search-item">
+          <table>
+            <tr>
+              <td width="99%" style="table-layout:fixed" nowrap>
+                <input id="singer-input" type="text" data-mini="true" value="" placeholder="Singer Name such as：Justin Bieber -> JB"
+                  style="text-align:center" />
+              </td>
+              <td width="1%" height="25px" style="table-layout:fixed">
+                <img class="img-click-seach" src="images/icon/transparent.png"
+                  style="width: 25px;height: 25px; margin-top:5px; margin-right:15px;" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <!--查找选项1-->
+        <div id="singer-navbar" data-role="navbar" data-grid="c" class="swiper-container">
+          <div class="swiper-wrapper">
+            <div id="singertype_all" class="swiper-slide on" style="text-shadow:none;" onclick="SetSingerType(0)">All
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_cn" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(1)">China
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_gt" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(2)">HongKong
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_en" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(3)">English
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_jp" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(4)">Japan
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_kr" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(5)">Korea
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_vn" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(6)">Vietnam
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_kh" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(7)">Cambodia
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_in" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(8)">India
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_th" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(9)">Thailand
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_ph" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(10)">Philippines
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_my" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(11)">Malaysia
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_mm" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(12)">Myanmar
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_id" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(13)">Indonesia
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_la" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(14)">Laos
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_ru" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(15)">Russia
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_fr" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(16)">France
+            </div>
+            <div><img src="images/icon/song_type_line.png" style="height: 45px;" /></div>
+            <div id="singertype_qt" class="swiper-slide" style="text-shadow:none;" onclick="SetSingerType(17)">other
+            </div>
+          </div>
+        </div>
+        <!--歌手列表-->
+        <section id="singer-gallery" class="my-listview" style="padding-top:20px;">
+          <!--列表模板-->
+          <li id="singer-gallery-item" style="text-shadow:none;display:none">
+            <div class="itemclick" onclick="SearchBySinger('SingerName')" data-type="horizontal"
+              style="width:100%;height: 59px;">
+              <div style="width: 20%;height: 59px;line-height:59px;float: left;">
+                <img style="margin-left: 10px;" src="singer/singer_photo.png" class="my-listview-singer-photo" />
+              </div>
+              <div class="singer-name" style="text-shadow:none;width: 70%;height: 59px;line-height:59px;float: left;">
+                刘天王
+              </div>
+              <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+                <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+              </div>
+            </div>
+            <div id="singer-itme-line"
+              style="background-color: grey; height: 0.5px; border-top:0px; border-bottom:0px;">
+            </div>
+          </li>
+        </section>
+
+        <!--分页处理-->
+        <div id="singer-paging" data-role="footer" data-theme="none"
+          style="float:right; padding-bottom:20px;border:0px;display:none">
+          <table width="100%">
+            <tr>
+              <td style="text-shadow:none;table-layout:fixed">
+                <a id="singer-currpage">0</a>
+              </td>
+              <td style="text-shadow:none;table-layout:fixed">
+                <a id="singer-maxpage">/0</a>
+              </td>
+              <td id="singer-prevpage" style="text-shadow:none">
+                <button type="button" onclick="OnPrevPageClick()" style="width: 120px; height: 33px; left: 0px;">PageUp
+                </button>
+              </td>
+              <td id="singer-nextpage" style="text-shadow:none;width: 80px;">
+                <button type="button" onclick="OnNextPageClick()" style="width: 120px; height: 33px; left: 10px;">PageDown
+                </button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!--歌曲类型-->
+      <div id="song-type" class="my-listview" style="text-shadow:none;display:none">
+        <!--列表模板-->
+        <div class="itemclick" onclick="SearchBySongType('type-font1', '对唱')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-gexing1"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font1"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">Dute</span>
+            <!-- <font id="type-font1" size="4" color="#FFFFFF" style="text-shadow:none;margin-left: 15px;">对唱
+                                    </font> -->
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="type-itme-line1"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div id="songtype-itme2" class="itemclick" onclick="SearchBySongType('type-font2', '民歌')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-ktv"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font2"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">folk song</span>
+            <!-- <font id="type-font2" size="4" color="#FFFFFF" style="text-shadow:none;margin-left: 15px;">民歌</font> -->
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="type-itme-line2"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 1.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div class="itemclick" onclick="SearchBySongType('type-font3', '戏曲')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+
+            <span class="iconfont icon-gequicon"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font3"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">opera</span>
+
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="hot-itme-line3"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div class="itemclick" onclick="SearchBySongType('type-font4', '儿歌')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-KTV"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font4"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">child</span>
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="type-itme-line4"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 1.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div class="itemclick" onclick="SearchBySongType('type-font5', '生日')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-leibie2"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font5"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">Birthday</span>
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="type-itme-line5"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div class="itemclick" onclick="SearchBySongType('type-font6', '喜庆')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-xihuan1"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font5"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">Joyful</span>
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="type-itme-line6"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 1.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div class="itemclick" onclick="SearchBySongType('type-font7', '怀旧')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-geming"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font5"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">Nostalgia</span>
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="type-itme-line7"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div class="itemclick" onclick="SearchBySongType('type-font8', '串烧')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-youtube"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #f57878;"></span>
+            <span id="type-font8"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">House Music</span>
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="type-itme-line8"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 1.5px; border-top:0px; border-bottom:0px;">
+        </div>
+      </div>
+
+      <!--语种类型-->
+      <div id="lang-search" style="display:none">
+        <ul data-role="listview" data-inset="true">
+          <li><a href="#" onclick="SearchBySongLang('国语')">Mandarin</a></li>
+          <li><a href="#" onclick="SearchBySongLang('粤语')">Cantonese</a></li>
+          <li><a href="#" onclick="SearchBySongLang('闽南语')">Hokkien</a></li>
+          <li><a href="#" onclick="SearchBySongLang('英语')">English</a></li>
+          <li><a href="#" onclick="SearchBySongLang('巫语')">Malay</a></li>
+          <li><a href="#" onclick="SearchBySongLang('印尼语')">Indonesian</a></li>
+          <li><a href="#" onclick="SearchBySongLang('日语')">Japanese</a></li>
+          <li><a href="#" onclick="SearchBySongLang('韩语')">Korean</a></li>
+           <li><a href="#" onclick="SearchBySongLang('泰语')">Thai</a></li>
+          <li><a href="#" onclick="SearchBySongLang('缅甸语')">Burmese</a></li>
+          <li><a href="#" onclick="SearchBySongLang('柬埔寨语')">Cambodia</a></li>
+          <li><a href="#" onclick="SearchBySongLang('老挝语')">Lao</a></li>
+          <li><a href="#" onclick="SearchBySongLang('印度语')">Hindi</a></li>
+
+          <li><a href="#" onclick="SearchBySongLang('菲律宾语')">Filipino</a></li>
+          <li><a href="#" onclick="SearchBySongLang('其他')">other</a></li>
+        </ul>
+      </div>
+
+      <!--歌曲排行-->
+      <div id="top-search" class="my-listview" style="display:none">
+        <!--列表模板-->
+        <div class="itemclick" onclick="SearchBySortType('singer-font1', 'TopByHotSong')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <!-- adam增加图标 -->
+            <span class="iconfont icon-remen"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #ffffff;"></span>
+            <span id="singer-font1"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">Top Hits</span>
+
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="hot-itme-line1"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 0.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+        <div class="itemclick" onclick="SearchBySortNewSong('singer-font2', 'TopByNewSong')" data-type="horizontal"
+          style="width:100%;height: 59px;">
+          <div style="width: 90%;height: 59px;line-height:59px;float: left;">
+            <span class="iconfont icon-zuixin1"
+              style="text-shadow: none; margin-left: 15px; font-size: 18px;color: #ffffff;"></span>
+            <span id="singer-font2"
+              style="text-shadow: none;margin-left: 10px;font-size: 16px;  color: #ffffff;">New Song</span>
+
+          </div>
+          <div style="width: 10%;height: 59px;line-height:59px;float: left;">
+            <img src="images/icon/singer_more.png" class="imgCenter" width="30px" height="30px" />
+          </div>
+        </div>
+        <div id="hot-itme-line2"
+          style="margin:0 auto; background-color: grey; width: 95%; height: 1.5px; border-top:0px; border-bottom:0px;">
+        </div>
+
+      </div>
+    </div>
+
+    <!--切歌，重唱，原唱/伴唱，音量，音调-->
+<div data-role="footer" data-id="footernav" data-theme="none" data-position="fixed" data-tap-toggle="false">
+   <div id="footer">
+  <div class="bottom-menu">
+<li style="width: 16%;">
+  <div onclick="SendCommand('MuOr'); toggleButtonState(this);" class="buttonmenu">
+    <div style="height: 5px; position: relative; z-index: 2;">
+      <span class="iconfont icon-yuanchang1 select-yc text-switch" aria-hidden="true"></span>
+    </div>
+    <span class="button-text">Vocals</span>
+  </div>
+</li>
+
+<li style="width: 16%;">
+  <div onclick="SendCommand('Reset'); toggleButtonState(this);" class="buttonmenu">
+    <div style="height: 5px; position: relative; z-index: 2;">
+      <span class="iconfont icon-zhongchang select-yc text-switch" aria-hidden="true"></span>
+    </div>
+    <span class="button-text">Repeat</span>
+  </div>
+</li>
+<li style="width: 16%;">
+  <div onclick="SendCommand('huanying'); toggleButtonState(this);" class="buttonmenu">
+    <div style="height: 5px; position: relative; z-index: 2;">
+      <span class="iconfont icon-lizhigequ select-yc text-switch" aria-hidden="true"></span>
+    </div>
+    <span class="button-text">TVideo</span>
+  </div>
+</li>
+
+<li style="width: 16%;">
+  <a href="#popupMenu" data-rel="popup" data-position-to="window" class="buttonmenu-link" onclick="toggleButtonState(this);">
+    <div class="buttonmenu">
+      <div style="height: 5px; position: relative; z-index: 2;">
+        <span class="iconfont icon-laba select-yc text-switch" aria-hidden="true"></span>
+      </div>
+      <span class="button-text">SoundC</span>
+    </div>
+  </a>
+</li>
+
+<li style="width: 16%;">
+  <div onclick="SendCommand('Skip'); toggleButtonState(this);" class="buttonmenu">
+    <div style="height: 5px; position: relative; z-index: 2;">
+      <span class="iconfont icon-qiege select-yc text-switch" aria-hidden="true"></span>
+    </div>
+    <span class="button-text">Next</span>
+  </div>
+</li>
+
+<li style="width: 16%;">
+  <div onclick="SendCommand('Play'); toggleButtonState(this);" class="buttonmenu">
+    <div style="height: 5px; position: relative; z-index: 2;">
+      <span class="iconfont icon-iconfontplay2 select-yc text-switch" aria-hidden="true"></span>
+    </div>
+    <span class="button-text">Pause</span>
+  </div>
+</li>
+
+        </div>
+      </div>
+    </div>
+
+    <!--设置菜单-->
+    <div data-role="popup" id="popupMenu" data-theme="a">
+      <style>
+        .set-menu-sound li {
+          float: left;
+          width: 33%;
+          height: 80px;
+          overflow: hidden;
+          list-style-type: none;
+        }
+
+        .set-menu-sound li img {
+          width: 33px;
+          height: 24px;
+        }
+
+        .set-menu-sound li a {
+          display: block;
+          font-weight: normal;
+          text-decoration: none;
+          text-align: center;
+          padding-top: 8px;
+        }
+
+        .set-menu-sound li a:active {
+          filter: Gray;
+          -webkit-filter: grayscale(100%);
+        }
+
+        .set-menu-sound li a h5 {
+          text-shadow: none;
+          text-align: center;
+          margin-top: -2px;
+          color: white;
+        }
+      </style>
+
+      <script type="text/javascript">
+
+
+
+    // adam切换按钮选中状态的函数
+    function toggleButtonState(element) {
+      // 移除其他按钮的选中状态
+      var buttons = document.querySelectorAll('.bottom-menu .buttonmenu, .bottom-menu .buttonmenu-link');
+      buttons.forEach(function(button) {
+        button.classList.remove('selected');
+      });
+      
+      // 为当前点击的按钮添加选中状态
+      // 如果是链接元素内的buttonmenu，则为链接元素添加选中状态
+      if (element.classList.contains('buttonmenu-link')) {
+        element.classList.add('selected');
+      } else if (element.classList.contains('buttonmenu')) {
+        element.classList.add('selected');
+      } else {
+        // 如果点击的是buttonmenu内部的元素，则查找父级buttonmenu
+        var parentButton = element.closest('.buttonmenu, .buttonmenu-link');
+        if (parentButton) {
+          parentButton.classList.add('selected');
+        }
+      }
+    }
+    
+    // 页面加载完成后为第一个按钮设置选中状态
+    document.addEventListener('DOMContentLoaded', function() {
+      var firstButton = document.querySelector('.bottom-menu .buttonmenu');
+      if (firstButton) {
+        firstButton.classList.add('selected');
+      }
+    });
+
+
+
+
+
+
+        function ShowHideSetItem(index) {
+          for (var i = 2; i < 4; i++) {
+            $("#control-set" + i).hide();
+          }
+
+          $("#control-set" + index).show();
+        }
+
+        /*swiper-slide的点击事件*/
+        var mSingerId;
+        $(function () {
+          $(".swiper-slide").click(function () {
+            $(".swiper-slide").removeClass("on");
+            $(this).addClass("on");
+            $('.line-list').text('');
+            //记录歌星页面swiper slide的id
+            if ($("#singer-search").is(":visible")) {
+              mSingerId = $(this).attr('id');
+            }
+          });
+        });
+
+        /*Initialize Swiper*/
+        /*var swiper = new Swiper('.swiper-container', {
+            //autoplay:true,//可选选项，自动滑动
+            freeMode:true,//滑动不够一格，不会自动贴合
+            slidesPerView:4,//设置slider容器能够同时显示的slides数量
+                spaceBetween:30,
+                pagination: {
+                el: '.swiper-pagination',
+                clickable: true
+                }
+        });*/
+
+           var swiper_singer = new Swiper('.swiper-container', {
+        pagination: '.pagination',
+        loop: false,
+        mode: 'horizontal',
+        freeMode: true,
+        slidesPerView: 'auto',
+        spaceBetween: 10, /* 滑动项之间的间距 */
+        touchRatio: 0.8,
+        longSwipesRatio: 0.3,
+        threshold: 10,
+        followFinger: true,
+        observer: true,
+        observeParents: true,
+        momentumRatio: 0.6,
+        momentumBounceRatio: 0.2,
+        momentumVelocityRatio: 1.2,
+        grabCursor: true,
+        freeModeMomentum: true,
+        freeModeMomentumRatio: 0.8,
+        freeModeMomentumBounce: true,
+        freeModeMomentumBounceRatio: 0.3,
+        freeModeMomentumVelocityRatio: 1.2,
+        freeModeSticky: false
+      });
+
+      var swiper_songlang = new Swiper('.swiper-container-songlang', {
+        pagination: '.pagination',
+        loop: false,
+        mode: 'horizontal',
+        freeMode: true,
+        slidesPerView: 'auto',
+        spaceBetween: 10, /* 滑动项之间的间距 */
+        touchRatio: 0.8,
+        longSwipesRatio: 0.3,
+        threshold: 10,
+        followFinger: true,
+        observer: true,
+        observeParents: true,
+        momentumRatio: 0.6,
+        momentumBounceRatio: 0.2,
+        momentumVelocityRatio: 1.2,
+        grabCursor: true,
+        freeModeMomentum: true,
+        freeModeMomentumRatio: 0.8,
+        freeModeMomentumBounce: true,
+        freeModeMomentumBounceRatio: 0.3,
+        freeModeMomentumVelocityRatio: 1.2,
+        freeModeSticky: false
+      });
+
+
+        <!--背景按下效果,没用到-->
+        $(function () {
+          $("#img_singer_seach_pressed").on("touchstart", function () {
+            $(this).css({
+              // 背景颜色
+              backgroundColor: "gainsboro",
+              // 背景图片
+              //						    backgroundImage: "url(images/icon/seach_click.png)",
+              // 背景图片大小
+              backgroundSize: "100% 100%"
+              // 背景图片定位
+              //backgroundPosition: "50px 50px"
+              // 背景图片重复
+              //						    backgroundRepeat: "no-repeat"
+            });
+          }).on("touchend", function () {
+            $(this).css({
+              // 背景颜色
+              background: "white",
+              // 背景图片
+              //						    backgroundImage: "url(images/icon/seach.png)",
+              // 背景图片大小
+              backgroundSize: "100% 100%"
+              // 背景图片定位
+              //backgroundPosition: "50px 50px"
+              // 背景图片重复
+              //						    backgroundRepeat: "no-repeat"
+            });
+          });
+        });
+
+        // <!--歌星item按下效果-->
+        $(function () {
+          $(".friend").on("touchstart", function () {
+            $(this).css({
+              // 背景颜色
+              background: "gainsboro",
+              // 背景图片
+              //						    backgroundImage: "url(images/icon/seach_click.png)",
+              // 背景图片大小
+              backgroundSize: "100% 100%"
+              // 背景图片定位
+              //backgroundPosition: "50px 20px",
+              // 背景图片重复
+              //						    backgroundRepeat: "no-repeat"
+            });
+          }).on("touchend", function () {
+            $(this).css({
+              // 背景颜色
+              background: "white",
+              // 背景图片
+              //						    backgroundImage: "url(images/icon/seach.png)",
+              // 背景图片大小
+              backgroundSize: "100% 100%"
+              // 背景图片定位
+              //backgroundPosition: "50px 20px",
+              // 背景图片重复
+              //						    backgroundRepeat: "no-repeat"
+            });
+          });
+        });
+
+        // <!--底部tab按钮按下效果-->
+        $(function () {
+          $(".tab_btn").on("touchstart", function () {
+            $(this).css({
+              // 背景颜色
+              background: "gainsboro",
+              // 背景图片
+              //						    backgroundImage: "url(images/icon/seach_click.png)",
+              // 背景图片大小
+              backgroundSize: "100% 100%"
+              // 背景图片定位
+              //backgroundPosition: "50px 20px",
+              // 背景图片重复
+              //						    backgroundRepeat: "no-repeat"
+            });
+          }).on("touchend", function () {
+            $(this).css({
+              // 背景颜色
+              background: "transparent",
+              // 背景图片
+              //						    backgroundImage: "url(images/icon/seach.png)",
+              // 背景图片大小
+              backgroundSize: "100% 100%"
+              // 背景图片定位
+              //backgroundPosition: "50px 20px",
+              // 背景图片重复
+              //						    backgroundRepeat: "no-repeat"
+            });
+          });
+        });
+
+
+        // var mySecondSwiper = new Swiper('.mySwiper', {
+        //     slidesPerView: 1,
+        //     spaceBetween: 30,
+        //     pagination: {
+        //         el: '.swiper-pagination',
+        //         clickable: true,
+        //     },
+
+        //     loop: true,
+        //     autoplay: {
+        //         delay: 2000,
+        //         disableOnInteraction: false,
+        //     }
+
+        // });
+
+        $(document).ready(function () {
+          // 发送 AJAX 请求获取图片数据
+          // 从 URL 中读取 language 参数
+          var urlParams = new URLSearchParams(window.location.search);
+          var language = urlParams.get('language') || 'zh'; // 如果没有 language 参数，默认值为 'default'
+
+          $.ajax({
+            url: 'https://tvshow.huasee.com/api/place/qryTvLanguage', // ThinkPHP 后台登录接口地址
+            method: 'POST',
+            data: {
+              region: language,
+            },
+            success: function (response) {
+
+              // 检查响应是否成功
+              if (response.code === 200) {
+                // 获取图片数据
+                var images = response.data.tvBanner;
+
+
+                // 动态生成幻灯片
+                var swiperWrapper = $('#swiper-wrapper');
+                images.forEach(function (item) {
+                  var slideHtml = `
+                            <div class="swiper-slide">
+                                <div class="container">
+                                    <img src="${item.mainPic}" data-name="${item.title}" data-type="${item.type}"class="image">
+                                    <div class="text">${item.subTitle}</div>
+                                </div>
+                            </div>
+                        `;
+                  swiperWrapper.append(slideHtml);
+                });
+
+                // 初始化 Swiper
+                var mySwiper = new Swiper('.mySwiper', {
+                  slidesPerView: 1,
+                  spaceBetween: 30,
+                  pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                  },
+                  loop: true,
+                  autoplay: {
+                    delay: 15000,
+                    disableOnInteraction: false,
+                  }
+                });
+
+
+
+                // 为每个幻灯片中的图片添加点击事件监听器
+                document.querySelectorAll('.swiper-slide img').forEach(img => {
+                  img.addEventListener('click', function () {
+                    const imageName = this.getAttribute('data-type');
+                    const title = this.getAttribute('data-name');
+                    SearchBySortBanner(title, imageName);
+
+                  });
+                });
+              } else {
+                console.error('Request failed:', response.msg);
+              }
+            },
+            error: function (error) {
+              console.error('Request failed:', error);
+            }
+          });
+        });
+      </script>
+      <script>
+        // adam弹出登录窗口，验证成功后给出用户名，方便拿用户名去查询收藏歌曲，弹出模态框
+        document.getElementById('loginBtn').addEventListener('click', function () {
+          document.getElementById('loginModal').style.display = 'block';
+          $('#username').val(loginUserName)
+          $('#password').val(loginPassWord)
+          if (loginPassWord === '') {
+            $('#btnlogin').text('login')
+          } else {
+            $('#btnlogin').text('Log out')
+          }
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function () {
+          document.getElementById('loginModal').style.display = 'none';
+        });
+
+        // 点击模态框外部关闭模态框
+        window.addEventListener('click', function (event) {
+          if (event.target == document.getElementById('loginModal')) {
+            document.getElementById('loginModal').style.display = 'none';
+          }
+        });
+
+        // 处理表单提交
+        $('#loginForm').on('submit', function (event) {
+          event.preventDefault(); // 阻止表单默认提交行为
+
+          if (loginPassWord === '') {
+          } else {
+            loginPassWord = '';
+            loginUserName = '';
+            document.getElementById('loginModal').style.display = 'none';
+            ShowTips('Logout successful', 500)
+            retrun;
+          }
+          var username = $('#username').val();
+          var password = $('#password').val();
+
+          $.ajax({
+            type: 'GET', //请求方式
+            url: 'LoginServlet', //请求的url地址
+            data: { username: username, password: password }, //参数值
+            dataType: 'jsonp', //返回格式为json
+            jsonp: 'jsonpCallback', //服务端用于接收callback调用的function名的参数
+            success: function (data) {
+              if (data.success) {
+                // 登录成功，关闭模态框
+                $('#loginModal').hide()
+                loginUserName = username
+                loginPassWord = password
+                ShowTips('Login successful', 500)
+              } else {
+                $('#loginMessage').text(data.message)
+              }
+            },
+            error: function (xhr, status, error) {
+              // 请求失败，显示错误信息-->
+              $('#loginMessage').text(error)
+            },
+          })
+        });
+        
+      </script>
+
+
+      <!-- <div style="width:250px;height:150px;background-image: url(images/icon/pop_bg.png);border-radius: 6px;">
+        <div data-role="navbar" data-theme="b" style="padding-top:4px; padding-left:1px;padding-right:4px"> -->
+          <div style="width:250px;height:200px;background-color:#c2c2c2;border-radius: 6px;">
+        <div data-role="navbar" data-theme="b" style="padding-top:4px; padding-left:1px;padding-right:4px">
+          <ul>
+            <!--<li><a onclick="ShowHideSetItem(1)" class="ui-btn-active">控 制</a></li>-->
+            <li><a onclick="ShowHideSetItem(2)" class="ui-btn-active">Volume</a></li>
+            <li><a onclick="ShowHideSetItem(3)">Key</a></li>
+          </ul>
+        </div>
+
+    
+    <!--音量-->
+        <div id="control-set2" class="set-menu-sound" style="width:100%; margin-top:5px;">
+          <!-- 第一行：音量控制 -->
+          <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
+            <li style="margin: 0 10px;">
+              <a href="#" onclick="SendCommand('Music_down')">
+                <span class="iconfont icon-yinliangjianxiao select-yc text-switch"></span>
+                <h5>Music-</h5>
+              </a>
+            </li>
+            <li style="margin: 0 10px;">
+              <a href="#" onclick="SendCommand('Mute')">
+                <span class="iconfont icon-24gl-volumeDisable select-yc text-switch"></span>
+                <h5>Mute/On</h5>
+              </a>
+            </li>
+            <li style="margin: 0 10px;">
+              <a href="#" onclick="SendCommand('Music_up')">
+                <span class="iconfont icon-yinliangjiada select-yc text-switch"></span>
+                <h5>Music+</h5>
+              </a>
+            </li>
+          </div>
+          
+          <!-- 第二行：麦克风控制 -->
+          <div style="display: flex; justify-content: center; align-items: center;">
+            <li style="margin: 0 10px;">
+              <a href="#" onclick="SendCommand('Mic_down')">
+                <span class="iconfont icon-maikefeng select-yc text-switch"></span>
+                <h5>MIC-</h5>
+              </a>
+            </li>
+            <li style="margin: 0 10px;">
+              <a href="#" onclick="SendCommand('Mic_up')">
+                <span class="iconfont icon-maikefeng1 select-yc text-switch"></span>
+                <h5>MIC+</h5>
+              </a>
+            </li>
+          </div>
+        </div>
+
+   
+<!--音调-->
+        <div id="control-set3" class="set-menu-sound" style="width:100%; margin-top:22px; display: none;">
+          <li>
+            <a href="#" onclick="SendCommand('Tone_down')">
+              <span class="iconfont icon-a-yintiaojiangtiao select-yc text-switch"></span>
+              <h5>Key-</h5>
+            </a>
+          </li>
+         
+          <li>
+            <a href="#" onclick="SendCommand('Tone_nom')">
+              <span class="iconfont icon-yuanchang select-yc text-switch"></span>
+              <h5>Key</h5>
+            </a>
+         
+          </li>
+          <li>
+            <a href="#" onclick="SendCommand('Tone_up')">
+              <span class="iconfont icon-a-yintiaohuanyuan select-yc text-switch"></span>
+              <h5>Key+</h5>
+            </a>
+          </li>
+        </div>
+
+
+    </div>
+  </div>
+  <!-- 新增播放窗口样式 (可放在页面任意位置) -->
+  <!-- 半透明遮罩层 -->
+  <div id="playWindowOverlay"
+    style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;">
+  </div>
+
+  <!-- 播放窗口 -->
+  <div id="playWindow"
+    style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2001;border:1px solid #ccc;background:#fff;padding:15px;border-radius:8px;width:90%;max-width:600px;">
+    <!--    <div id="playWindow" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2001;border:1px solid #ccc;background:#fff;padding:10px;width=95%;max-width:600px;">-->
+    <!-- 关闭按钮移到右上角 -->
+    <button onclick="closePlayWindow()"
+      style="position:absolute;top:10px;right:10px;padding:5px 10px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">
+      ×
+    </button>
+
+    <!-- 歌曲信息区域 -->
+    <div style="margin-bottom:15px;text-align:center;">
+      <h3 id="playWindowSongName" style="margin:0 0 5px 0;color:#333;"></h3>
+      <p id="playWindowSinger" style="margin:0;color:#666;"></p>
+    </div>
+
+
+<iframe id="songFrame" width="100%" height="100%" 
+        src="" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+</iframe>
+
+
+    <!-- 点播歌曲按钮放在原来关闭按钮的位置 -->
+    <div style="text-align:center;margin-top:15px;">
+      <button onclick="orderSong()"
+        style="padding:8px 20px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;margin-right:10px;">
+        点播歌曲
+      </button>
+      <!-- <button onclick="closePlayWindow()"
+        style="padding:8px 20px;background:#f44336;color:white;border:none;border-radius:4px;cursor:pointer;">
+        关闭播放
+      </button> -->
+    </div>
+
+
+  </div>
+
+<script>
+  // 页面加载完成后自动进入全屏
+  window.addEventListener('load', function() {
+    // 延迟执行以确保页面完全加载
+    setTimeout(function() {
+      enterFullscreen();
+    }, 100);
+  });
+
+  // 监听页面可见性变化，确保页面始终全屏
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      enterFullscreen();
+    }
+  });
+
+  // 监听窗口大小变化，确保全屏状态
+  window.addEventListener('resize', function() {
+    enterFullscreen();
+  });
+
+  function enterFullscreen() {
+    const element = document.documentElement;
+    
+    // 检查是否已经处于全屏状态
+    if (document.fullscreenElement || 
+        document.mozFullScreenElement || 
+        document.webkitFullscreenElement || 
+        document.msFullscreenElement) {
+      return; // 已经全屏，无需再次进入
+    }
+    
+    // 进入全屏模式
+    if (element.requestFullscreen) {
+      element.requestFullscreen().catch(function(err) {
+        console.log('Unable to enter full screen mode: ', err);
+      });
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    }
+  }
+  
+  // 页面失焦时重新获取焦点并进入全屏
+  window.addEventListener('blur', function() {
+    setTimeout(function() {
+      window.focus();
+      enterFullscreen();
+    }, 500);
+  });
+</script>
+
+
+
+
+
+
+
+  <div class="tipClass">
+    <h4 id="showtip">测试提示</h4>
+  </div>
+
+</body>
+
+</html>
