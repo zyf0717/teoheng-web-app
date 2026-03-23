@@ -87,12 +87,34 @@ For best compatibility, serve and open the app over plain `http://` on the same 
 In the UI, you can usually get this from the QR code shown by the karaoke system.
 If the QR scanner is unavailable on your browser or OS, enter the server URL manually instead.
 
+### Browser Compatibility Notes
+
+Browsers do not all handle local-network access the same way when the app is hosted on a public domain and the KOD box or mock server is on a private LAN address such as `http://192.168.x.x:8080`.
+
+- Safari can work with an `http://` app origin in some setups. This also generally applies to all iOS browsers, because iOS browsers share the same WebKit backend. The following pattern has been confirmed to work during manual testing:
+
+```text
+http://ktv.yifei.sg/?baseUrl=http%3A%2F%2F172.24.132.70%3A8080
+```
+
+- Chrome is stricter about private-network access from a public site. This behavior also matches Android Chrome in practice. During manual testing, Chrome required all of the following:
+  - opening the app over `https://`
+  - using the LAN IP of the KOD box or mock server
+  - allowing access to local devices or the local network when prompted by the browser
+
+This pattern was confirmed to work in Chrome:
+
+```text
+https://ktv.yifei.sg/?baseUrl=http%3A%2F%2F172.24.132.70%3A8080
+```
+
 ## Permissions
 
 - Camera access is only needed if you use the QR scanner.
 - Camera scanning may not work on some browser and operating system combinations.
-- The app is intended for direct local-network access over plain `http://`, without a backend proxy.
-- Browser behavior can still vary across platforms, but the current app flow no longer depends on an explicit browser-level local-network permission trigger.
+- Browser handling of local-network access varies, and may require an `https://` app origin and explicit permission to access local devices or the local network.
+- The app is intended for direct local-network access, without a backend proxy.
+- Browser behavior can still vary across platforms, and may or may not require an explicit browser-level local-network permission trigger.
 
 ## How It Works
 
