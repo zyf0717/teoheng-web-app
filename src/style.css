@@ -611,6 +611,10 @@ th {
   white-space: nowrap;
 }
 
+.top-hits-empty-row td {
+  border-top: 0;
+}
+
 .top-hit-row-content {
   display: flex;
   align-items: center;

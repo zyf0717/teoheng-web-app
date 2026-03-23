@@ -241,7 +241,7 @@ function updatePageInput(event) {
             </tr>
           </tbody>
           <tbody v-else>
-            <tr>
+            <tr class="top-hits-empty-row">
               <td colspan="2" class="empty">
                 <div class="empty-state">
                   <span>{{ searchState.loading ? 'Loading songs...' : 'No results yet.' }}</span>
