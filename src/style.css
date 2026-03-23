@@ -11,7 +11,9 @@
   --color-danger: #b42318;
   --color-tab-active: #e2e8f0;
   --command-bar-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
-  --command-bar-offset: 7rem;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --command-bar-offset-collapsed: 5.5rem;
+  --command-bar-offset-expanded: 9rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -45,6 +47,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   color: var(--color-text);
   background: var(--color-bg);
   overscroll-behavior-y: contain;
@@ -120,8 +123,12 @@ pre {
 .app-shell {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem calc(var(--command-bar-offset) + 1rem);
+  padding: 2rem 1rem calc(var(--command-bar-offset-collapsed) + var(--safe-area-bottom) + 1rem);
   overscroll-behavior-y: contain;
+}
+
+.app-shell-command-bar-expanded {
+  padding-bottom: calc(var(--command-bar-offset-expanded) + var(--safe-area-bottom) + 1rem);
 }
 
 .hero-panel {
@@ -510,6 +517,8 @@ p {
   background: color-mix(in srgb, var(--color-surface) 96%, transparent);
   backdrop-filter: blur(8px);
   box-shadow: var(--command-bar-shadow);
+  padding-bottom: var(--safe-area-bottom);
+  overflow-anchor: none;
 }
 
 .command-bar-inner {
@@ -527,6 +536,7 @@ p {
   flex-wrap: wrap;
   gap: 0.75rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .command-bar-row-primary {
@@ -825,7 +835,11 @@ th {
 
 @media (max-width: 900px) {
   .app-shell {
-    padding: 0 0 calc(var(--command-bar-offset) + 1rem);
+    padding: 0 0 calc(var(--command-bar-offset-collapsed) + var(--safe-area-bottom) + 1rem);
+  }
+
+  .app-shell-command-bar-expanded {
+    padding-bottom: calc(var(--command-bar-offset-expanded) + var(--safe-area-bottom) + 1rem);
   }
 
   .main-panels {
@@ -882,6 +896,16 @@ th {
 
   .mobile-panel-hidden {
     display: none;
+  }
+
+  .command-bar-row {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+  }
+
+  .command-group,
+  .command-group-buttons {
+    flex-wrap: nowrap;
   }
 
   .pagination-stack {

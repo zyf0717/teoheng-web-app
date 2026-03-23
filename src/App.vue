@@ -59,7 +59,6 @@ const singerPageInput = ref(1)
 const favoritesPageInput = ref(1)
 const activeMobileTab = ref(initialPrimaryTab)
 const activeBrowseTab = ref(initialPrimaryTab)
-const commandBarRef = ref(null)
 const systemPrefersDarkMode = ref(getSystemDarkModePreference())
 const themeOverride = ref(null)
 const isDarkMode = computed(() => themeOverride.value ?? systemPrefersDarkMode.value)
@@ -113,7 +112,6 @@ const {
 } = useDiagnostics({ eventLimit: DIAGNOSTIC_EVENT_LIMIT })
 
 let pollHandle = null
-let commandBarResizeObserver = null
 let themeMediaQuery = null
 
 const displayPage = computed(() => searchState.page + 1)
@@ -424,14 +422,6 @@ function syncPolling() {
   }, POLL_INTERVAL_MS)
 }
 
-function updateCommandBarOffset() {
-  const height = commandBarRef.value
-    ? Math.ceil(commandBarRef.value.getBoundingClientRect().height)
-    : 0
-
-  document.documentElement.style.setProperty('--command-bar-offset', `${height + 16}px`)
-}
-
 function applyTheme() {
   document.documentElement.dataset.theme = isDarkMode.value ? 'dark' : 'light'
 }
@@ -546,16 +536,6 @@ onMounted(() => {
 
   logDiagnosticEvent('Session started')
   initializeDeviceAccess()
-  updateCommandBarOffset()
-
-  if (typeof ResizeObserver !== 'undefined' && commandBarRef.value) {
-    commandBarResizeObserver = new ResizeObserver(() => {
-      updateCommandBarOffset()
-    })
-    commandBarResizeObserver.observe(commandBarRef.value)
-  } else {
-    window.addEventListener('resize', updateCommandBarOffset)
-  }
 })
 
 onBeforeUnmount(() => {
@@ -563,24 +543,16 @@ onBeforeUnmount(() => {
     window.clearInterval(pollHandle)
   }
 
-  if (commandBarResizeObserver) {
-    commandBarResizeObserver.disconnect()
-  }
-
   if (themeMediaQuery) {
     themeMediaQuery.removeEventListener('change', syncThemePreference)
   }
 
   disposeDiagnostics()
-
-  if (!commandBarResizeObserver) {
-    window.removeEventListener('resize', updateCommandBarOffset)
-  }
 })
 </script>
 
 <template>
-  <main class="app-shell">
+  <main class="app-shell" :class="{ 'app-shell-command-bar-expanded': showMixerControls }">
     <div class="mobile-tabs section-gap" role="tablist" aria-label="Main panels">
       <button
         data-test="mobile-tab-settings"
@@ -784,7 +756,7 @@ onBeforeUnmount(() => {
     </div>
   </main>
 
-  <div ref="commandBarRef" class="command-bar">
+  <div class="command-bar" :class="{ 'command-bar-expanded': showMixerControls }">
     <CommandBar
       :command-bar-busy="commandBarBusy"
       :mic-controlled-by-kod="micControlledByKod"
