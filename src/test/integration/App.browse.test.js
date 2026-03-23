@@ -654,7 +654,7 @@ describe('App', () => {
     wrapper.unmount()
   })
 
-  it('collapses the top hits filter panel after reset', async () => {
+  it('keeps the top hits filter panel open after reset', async () => {
     const wrapper = mount(App)
 
     await flushPromises()
@@ -662,7 +662,21 @@ describe('App', () => {
     await wrapper.get('[data-test="search-reset"]').trigger('click')
     await flushPromises()
 
-    expect(wrapper.get('details.filter-panel').element.open).toBe(false)
+    expect(wrapper.get('details.filter-panel').element.open).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('keeps the singer filter panel open after reset', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    await wrapper.get('[data-test="mobile-tab-singer"]').trigger('click')
+    wrapper.findAll('details.filter-panel')[1].element.open = true
+    await wrapper.get('[data-test="singer-search-reset"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.findAll('details.filter-panel')[1].element.open).toBe(true)
 
     wrapper.unmount()
   })

@@ -62,7 +62,6 @@ function submitSearch() {
 
 function resetSearch() {
   emit('reset-search')
-  collapseFilterPanel()
 }
 
 function updateSingerPageInput(event) {
