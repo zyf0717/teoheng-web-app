@@ -243,7 +243,7 @@ onBeforeUnmount(() => {
         A custom interface for the same endpoints used by the Teo Heng WASUKA KOD-9000 web app.
       </p>
       <p class="field-help">
-        <strong>NOTE:</strong> Browser behavior differs: Safari and most iOS browsers may work with <code>http://</code>, while Chrome (including Android Chrome) typically requires opening this app over <code>https://</code> and allowing local network access.
+        <strong>NOTE:</strong> Safari and iOS browsers work with <code>http://</code>, while Chrome (excluding iOS Chrome) typically automatically opens this web app over <code>https://</code> and requires local network access.
       </p>
     </section>
 
