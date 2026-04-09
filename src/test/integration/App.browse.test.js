@@ -460,6 +460,30 @@ describe('App', () => {
     wrapper.unmount()
   })
 
+  it('moves from a top hits singer click into an immediate singer search', async () => {
+    const wrapper = mount(App)
+
+    await flushPromises()
+    searchSongs.mockClear()
+    await wrapper.get('[data-test="top-hit-singer-9029901"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.get('[data-test="search-singer"]').element.value).toBe('Tester')
+    expect(searchSongs).toHaveBeenCalledWith(
+      TEST_BASE_URL,
+      expect.objectContaining({
+        singer: 'Tester',
+        songName: '',
+        songType: '',
+        sortType: '',
+        lang: '',
+        page: 0,
+      }),
+    )
+
+    wrapper.unmount()
+  })
+
   it('renders saved favourites in the favourites tab', async () => {
     window.localStorage.setItem(
       FAVORITES_STORAGE_KEY,

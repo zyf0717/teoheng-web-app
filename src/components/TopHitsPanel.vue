@@ -56,6 +56,7 @@ const emit = defineEmits([
   'go-to-setup',
   'submit-search',
   'reset-search',
+  'search-top-hits-by-singer',
   'promote-song',
   'add-song',
   'favorite-song',
@@ -197,7 +198,17 @@ function updatePageInput(event) {
                     <div class="song-title-row">
                       <strong>{{ song.name }}</strong>
                     </div>
-                    <div class="song-artist">{{ song.singer }}</div>
+                    <button
+                      v-if="song.singer"
+                      :data-test="`top-hit-singer-${song.id}`"
+                      type="button"
+                      class="song-artist song-artist-button"
+                      :aria-label="`Search Top Hits for ${song.singer}`"
+                      @click="emit('search-top-hits-by-singer', song.singer)"
+                    >
+                      {{ song.singer }}
+                    </button>
+                    <div v-else class="song-artist">{{ song.singer }}</div>
                   </div>
                 </div>
               </td>

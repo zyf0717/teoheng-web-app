@@ -670,6 +670,18 @@ th {
   color: var(--color-muted);
 }
 
+.song-artist-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.song-artist-button:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
 .singer-icon {
   width: 3.5rem;
   height: 3.5rem;

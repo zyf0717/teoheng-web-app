@@ -692,6 +692,7 @@ onBeforeUnmount(() => {
             @go-to-setup="goToSetup"
             @submit-search="submitSearch"
             @reset-search="resetSearch"
+            @search-top-hits-by-singer="searchTopHitsBySinger"
             @promote-song="promoteSong"
             @add-song="addSong"
             @favorite-song="addFavoriteSong"
